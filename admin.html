@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>随心选 - 后台管理</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <!-- 顶部导航栏 -->
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <h1 class="text-2xl font-bold text-gray-800">随心选后台管理</h1>
+                    </div>
+                    <div class="flex items-center">
+                        <button onclick="logout()" class="text-red-500 hover:text-red-700">
+                            退出登录
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 主要内容区域 -->
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <!-- 登录表单 -->
+            <div id="login-form" class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-6">管理员登录</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">用户名</label>
+                        <input type="text" id="admin-username" 
+                               class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">密码</label>
+                        <input type="password" id="admin-password" 
+                               class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <button onclick="adminLogin()" 
+                            class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+                        登录
+                    </button>
+                </div>
+            </div>
+
+            <!-- 产品管理区域 -->
+            <div id="admin-panel" class="hidden">
+                <!-- 分类管理 -->
+                <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                    <h2 class="text-xl font-bold mb-4">分类管理</h2>
+                    <div class="flex gap-4 mb-4">
+                        <input type="text" id="category-name" 
+                               placeholder="输入分类名称"
+                               class="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button onclick="addCategory()" 
+                                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                            添加分类
+                        </button>
+                    </div>
+                    <div id="category-list" class="flex flex-wrap gap-2">
+                        <!-- 分类列表将通过 JavaScript 动态生成 -->
+                    </div>
+                </div>
+
+                <!-- 添加产品表单 -->
+                <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                    <h2 class="text-xl font-bold mb-4">添加新产品</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">产品名称</label>
+                            <input type="text" id="product-name" 
+                                   class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">价格</label>
+                            <input type="number" id="product-price" 
+                                   class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">分类</label>
+                            <select id="product-category" 
+                                    class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <!-- 分类选项将通过 JavaScript 动态生成 -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">描述</label>
+                            <textarea id="product-description" 
+                                    class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                    rows="3"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">产品图片</label>
+                            <input type="file" id="product-image" 
+                                   accept="image/*"
+                                   class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <div id="image-preview" class="mt-2 hidden">
+                                <img src="" alt="预览图" class="w-32 h-32 object-cover rounded-lg">
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="addProduct()" 
+                            class="mt-4 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700">
+                        添加产品
+                    </button>
+                </div>
+
+                <!-- 产品列表 -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-xl font-bold mb-4">产品列表</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">图片</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">名称</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">分类</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">价格</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">描述</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="product-list" class="bg-white divide-y divide-gray-200">
+                                <!-- 产品列表将通过 JavaScript 动态生成 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 管理员信息（实际应用中应该从后端获取）
+        const ADMIN_USERNAME = 'admin';
+        const ADMIN_PASSWORD = 'admin123';
+
+        // 产品数据
+        let products = JSON.parse(localStorage.getItem('products')) || [];
+
+        // 分类数据
+        let categories = JSON.parse(localStorage.getItem('categories')) || [];
+
+        // 图片预览
+        document.getElementById('product-image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('image-preview');
+                    preview.classList.remove('hidden');
+                    preview.querySelector('img').src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // 管理员登录
+        function adminLogin() {
+            const username = document.getElementById('admin-username').value;
+            const password = document.getElementById('admin-password').value;
+
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                document.getElementById('login-form').classList.add('hidden');
+                document.getElementById('admin-panel').classList.remove('hidden');
+                loadProducts();
+            } else {
+                alert('用户名或密码错误！');
+            }
+        }
+
+        // 退出登录
+        function logout() {
+            document.getElementById('login-form').classList.remove('hidden');
+            document.getElementById('admin-panel').classList.add('hidden');
+            document.getElementById('admin-username').value = '';
+            document.getElementById('admin-password').value = '';
+        }
+
+        // 添加分类
+        function addCategory() {
+            const categoryName = document.getElementById('category-name').value.trim();
+            if (!categoryName) {
+                alert('请输入分类名称！');
+                return;
+            }
+
+            if (categories.includes(categoryName)) {
+                alert('该分类已存在！');
+                return;
+            }
+
+            categories.push(categoryName);
+            localStorage.setItem('categories', JSON.stringify(categories));
+            document.getElementById('category-name').value = '';
+            updateCategoryList();
+            updateCategorySelect();
+        }
+
+        // 删除分类
+        function deleteCategory(category) {
+            if (confirm(`确定要删除分类"${category}"吗？`)) {
+                const index = categories.indexOf(category);
+                if (index > -1) {
+                    categories.splice(index, 1);
+                    localStorage.setItem('categories', JSON.stringify(categories));
+                    updateCategoryList();
+                    updateCategorySelect();
+                }
+            }
+        }
+
+        // 更新分类列表显示
+        function updateCategoryList() {
+            const categoryList = document.getElementById('category-list');
+            categoryList.innerHTML = categories.map(category => `
+                <div class="flex items-center bg-gray-100 rounded-lg px-3 py-1">
+                    <span class="mr-2">${category}</span>
+                    <button onclick="deleteCategory('${category}')" class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // 更新产品表单中的分类选择框
+        function updateCategorySelect() {
+            const categorySelect = document.getElementById('product-category');
+            categorySelect.innerHTML = `
+                <option value="">请选择分类</option>
+                ${categories.map(category => `
+                    <option value="${category}">${category}</option>
+                `).join('')}
+            `;
+        }
+
+        // 添加产品
+        function addProduct() {
+            const name = document.getElementById('product-name').value;
+            const price = parseFloat(document.getElementById('product-price').value);
+            const category = document.getElementById('product-category').value;
+            const description = document.getElementById('product-description').value;
+            const imageInput = document.getElementById('product-image');
+            const preview = document.getElementById('image-preview');
+
+            if (!name || !price || !category || !description || !imageInput.files[0]) {
+                alert('请填写完整的产品信息！');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const product = {
+                    id: Date.now(),
+                    name: name,
+                    price: price,
+                    category: category,
+                    description: description,
+                    image: e.target.result
+                };
+
+                products.push(product);
+                localStorage.setItem('products', JSON.stringify(products));
+                loadProducts();
+
+                // 清空表单
+                document.getElementById('product-name').value = '';
+                document.getElementById('product-price').value = '';
+                document.getElementById('product-category').value = '';
+                document.getElementById('product-description').value = '';
+                imageInput.value = '';
+                preview.classList.add('hidden');
+
+                alert('产品添加成功！');
+            };
+
+            reader.readAsDataURL(imageInput.files[0]);
+        }
+
+        // 删除产品
+        function deleteProduct(id) {
+            if (confirm('确定要删除这个产品吗？')) {
+                products = products.filter(p => p.id !== id);
+                localStorage.setItem('products', JSON.stringify(products));
+                loadProducts();
+            }
+        }
+
+        // 加载产品列表
+        function loadProducts() {
+            const productList = document.getElementById('product-list');
+            productList.innerHTML = products.map(product => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <img src="${product.image}" alt="${product.name}" class="w-16 h-16 object-cover rounded">
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">${product.name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${product.category}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">￥${product.price}</td>
+                    <td class="px-6 py-4">${product.description}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <button onclick="deleteProduct(${product.id})" 
+                                class="text-red-600 hover:text-red-900">
+                            删除
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 初始化分类列表和选择框
+        updateCategoryList();
+        updateCategorySelect();
+    </script>
+</body>
+
+</html> 
