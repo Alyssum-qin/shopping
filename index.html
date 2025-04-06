@@ -207,8 +207,6 @@
 
                 <div class="nav-links hidden md:flex items-center space-x-8">
                     <a href="#" class="text-gray-600 hover:text-blue-600">首页</a>
-                    <a href="#" class="text-gray-600 hover:text-blue-600">人气推荐</a>
-                    <a href="#" class="text-gray-600 hover:text-blue-600">我的收藏</a>
                     <button onclick="openOrderQuery()" class="text-gray-600 hover:text-blue-600">订单查询</button>
                     <button onclick="openLoginModal()" id="login-button" class="text-gray-600 hover:text-blue-600">登录</button>
                     <span id="user-info" class="hidden">
@@ -403,16 +401,18 @@
     <div id="order-query-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 hidden">
         <div class="order-query-content bg-white rounded-lg shadow-xl mx-auto my-8 p-6 max-w-2xl">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold">订单查询</h2>
+                <h2 class="text-xl font-bold">我的订单</h2>
                 <button onclick="closeOrderQuery()" class="text-gray-500 hover:text-gray-700">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
+
+            <div id="order-list" class="space-y-4 mb-4"></div>
             
             <div id="order-status-result" class="hidden">
                 <div class="border rounded-lg p-4 mb-4">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold">订单信息</h3>
+                        <h3 class="text-lg font-bold">订单详情</h3>
                         <span id="order-status" class="px-3 py-1 rounded-full text-sm"></span>
                     </div>
                     <div class="space-y-2">
@@ -435,7 +435,7 @@
 
             <div id="no-order-found" class="hidden text-center py-8">
                 <i class="fas fa-search text-4xl text-gray-400 mb-4"></i>
-                <p class="text-gray-600">未找到相关订单信息</p>
+                <p class="text-gray-600">暂无订单信息</p>
             </div>
         </div>
     </div>
@@ -537,26 +537,31 @@
                 return;
             }
 
-            // 这里可以添加订单提交逻辑
+            // 创建订单数据
             const orderData = {
-                items: cart,
-                shippingInfo: {
-                    name,
-                    phone,
-                    address,
-                },
+                id: 'ORD' + Date.now(),
+                time: new Date().toLocaleString(),
+                status: '待发货',
+                receiver: name,
+                phone: phone,
+                address: address,
+                items: cart.map(item => ({
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity
+                })),
                 total: cart.reduce((acc, item) => acc + item.price * item.quantity, 0)
             };
 
-            // 模拟订单提交
-            alert('订单提交成功！');
-            console.log('订单信息：', orderData);
+            // 保存订单
+            saveOrder(orderData);
             
             // 清空购物车
             cart.length = 0;
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCart();
             closeCartModal();
+            alert('订单提交成功！');
         }
 
         function openCartModal() {
@@ -643,7 +648,105 @@
             alert('已退出登录');
         }
 
-        // 修改订单查询函数
+        // 订单存储相关
+        let orders = JSON.parse(localStorage.getItem('orders')) || {};
+
+        function saveOrder(orderData) {
+            if (!orders[orderData.phone]) {
+                orders[orderData.phone] = [];
+            }
+            orders[orderData.phone].push(orderData);
+            localStorage.setItem('orders', JSON.stringify(orders));
+        }
+
+        function showOrderDetails(order) {
+            // 显示订单信息
+            document.getElementById('order-id').textContent = order.id;
+            document.getElementById('order-time').textContent = order.time;
+            document.getElementById('order-status').textContent = order.status;
+            document.getElementById('order-receiver').textContent = order.receiver;
+            document.getElementById('order-phone').textContent = order.phone;
+            document.getElementById('order-address').textContent = order.address;
+
+            // 显示商品信息
+            const orderItems = document.getElementById('order-items');
+            orderItems.innerHTML = order.items.map(item => `
+                <div class="flex justify-between items-center">
+                    <span>${item.name}</span>
+                    <span>￥${item.price} × ${item.quantity}</span>
+                </div>
+            `).join('');
+
+            // 显示总金额
+            document.getElementById('order-total').textContent = `￥${order.total}`;
+
+            // 显示结果
+            document.getElementById('order-status-result').classList.remove('hidden');
+
+            // 设置订单状态样式
+            const statusElement = document.getElementById('order-status');
+            statusElement.className = 'px-3 py-1 rounded-full text-sm';
+            switch (order.status) {
+                case '待发货':
+                    statusElement.classList.add('bg-yellow-100', 'text-yellow-800');
+                    break;
+                case '已发货':
+                    statusElement.classList.add('bg-blue-100', 'text-blue-800');
+                    break;
+                case '已完成':
+                    statusElement.classList.add('bg-green-100', 'text-green-800');
+                    break;
+                default:
+                    statusElement.classList.add('bg-gray-100', 'text-gray-800');
+            }
+        }
+
+        function queryOrder() {
+            if (!currentUser) {
+                alert('请先登录');
+                openLoginModal();
+                return;
+            }
+
+            const phone = currentUser.phone;
+            const userOrders = orders[phone] || [];
+
+            if (userOrders.length === 0) {
+                document.getElementById('order-status-result').classList.add('hidden');
+                document.getElementById('no-order-found').classList.remove('hidden');
+                document.getElementById('order-list').innerHTML = '';
+                return;
+            }
+
+            // 显示订单列表
+            const orderList = document.getElementById('order-list');
+            orderList.innerHTML = userOrders.map((order, index) => `
+                <div class="border rounded-lg p-4 cursor-pointer hover:bg-gray-50" onclick="showOrderDetails(${JSON.stringify(order).replace(/"/g, '&quot;')})">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="font-medium">订单号：${order.id}</p>
+                            <p class="text-sm text-gray-500">${order.time}</p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-sm ${
+                            order.status === '待发货' ? 'bg-yellow-100 text-yellow-800' :
+                            order.status === '已发货' ? 'bg-blue-100 text-blue-800' :
+                            order.status === '已完成' ? 'bg-green-100 text-green-800' :
+                            'bg-gray-100 text-gray-800'
+                        }">${order.status}</span>
+                    </div>
+                    <div class="mt-2">
+                        <p class="text-gray-600">共 ${order.items.length} 件商品</p>
+                        <p class="text-right font-medium">总计：￥${order.total}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('no-order-found').classList.add('hidden');
+            
+            // 默认显示最新订单的详情
+            showOrderDetails(userOrders[userOrders.length - 1]);
+        }
+
         function openOrderQuery() {
             if (!currentUser) {
                 alert('请先登录');
@@ -660,72 +763,6 @@
             document.body.style.overflow = '';
             document.getElementById('order-status-result').classList.add('hidden');
             document.getElementById('no-order-found').classList.add('hidden');
-        }
-
-        function queryOrder() {
-            if (!currentUser) {
-                alert('请先登录');
-                openLoginModal();
-                return;
-            }
-
-            const phone = currentUser.phone;
-
-            // 模拟订单查询
-            const mockOrder = {
-                id: 'ORD' + Date.now(),
-                time: new Date().toLocaleString(),
-                status: '已发货',
-                receiver: '张三',
-                phone: phone,
-                address: '北京市朝阳区xxx街道xxx号',
-                items: [
-                    { name: '灰色休闲T恤', price: 129, quantity: 2 },
-                    { name: '黑色基础款T恤', price: 119, quantity: 1 }
-                ]
-            };
-
-            // 显示订单信息
-            document.getElementById('order-id').textContent = mockOrder.id;
-            document.getElementById('order-time').textContent = mockOrder.time;
-            document.getElementById('order-status').textContent = mockOrder.status;
-            document.getElementById('order-receiver').textContent = mockOrder.receiver;
-            document.getElementById('order-phone').textContent = mockOrder.phone;
-            document.getElementById('order-address').textContent = mockOrder.address;
-
-            // 显示商品信息
-            const orderItems = document.getElementById('order-items');
-            orderItems.innerHTML = mockOrder.items.map(item => `
-                <div class="flex justify-between items-center">
-                    <span>${item.name}</span>
-                    <span>￥${item.price} × ${item.quantity}</span>
-                </div>
-            `).join('');
-
-            // 计算并显示总金额
-            const total = mockOrder.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-            document.getElementById('order-total').textContent = `￥${total}`;
-
-            // 显示结果
-            document.getElementById('order-status-result').classList.remove('hidden');
-            document.getElementById('no-order-found').classList.add('hidden');
-
-            // 根据订单状态设置样式
-            const statusElement = document.getElementById('order-status');
-            statusElement.className = 'px-3 py-1 rounded-full text-sm';
-            switch (mockOrder.status) {
-                case '待付款':
-                    statusElement.classList.add('bg-yellow-100', 'text-yellow-800');
-                    break;
-                case '已发货':
-                    statusElement.classList.add('bg-blue-100', 'text-blue-800');
-                    break;
-                case '已完成':
-                    statusElement.classList.add('bg-green-100', 'text-green-800');
-                    break;
-                default:
-                    statusElement.classList.add('bg-gray-100', 'text-gray-800');
-            }
         }
 
         // 初始化用户界面
