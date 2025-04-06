@@ -4,12 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>电商网站</title>
+    <title>随心选 优质小物集中地</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
     <style>
         .banner {
-            background-image: url('https://picsum.photos/1920/400');
+            background-image: url('https://pic5.40017.cn/i/ori/1ClUnRmjziM.gif');
             background-size: cover;
             background-position: center;
             height: 400px;
@@ -28,61 +28,165 @@
         .banner p {
             font-size: 1.5rem;
         }
+
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding-left: 40px;
+            padding-right: 40px;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                padding-left: 24px;
+                padding-right: 24px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+        }
+
+        #product-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: flex-start;
+        }
+
+        .product-item {
+            flex-basis: calc((100% - 2rem) / 3);
+            margin-bottom: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .product-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+        }
+
+        @media (max-width: 768px) {
+            .product-item {
+                flex-basis: calc((100% - 1rem) / 2);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .product-item {
+                flex-basis: 100%;
+            }
+        }
     </style>
 </head>
 
 <body class="bg-gray-100">
-    <!-- banner区域 -->
     <div class="banner">
-        <div>
-            <h2>欢迎来到电商网站</h2>
-            <p>发现更多优质商品</p>
+        <div class="bg-gradient-to-b from-transparent to-gray-900/80 p-6 rounded-lg">
+            <h2 class="font-extrabold text-white">精选好物</h2>
+            <p class="text-lg text-gray-300">发现生活中的小确幸</p>
         </div>
     </div>
-    <!-- 导航栏 -->
-    <nav class="bg-white shadow-md">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-gray-800">电商网站</h1>
-            <div class="flex items-center space-x-4">
-                <a href="#" class="text-gray-600 hover:text-gray-800">首页</a>
-                <a href="#" class="text-gray-600 hover:text-gray-800">商品列表</a>
-                <a href="#" class="text-gray-600 hover:text-gray-800">我的订单</a>
-                <input type="text" id="search-input" class="border border-gray-300 rounded-md px-2 py-1" placeholder="搜索商品">
-                <button id="cart-button" class="relative text-gray-600 hover:text-gray-800">
-                    <i class="fa-solid fa-cart-shopping"></i>
-                    <span id="cart-count" class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1 py-0.5">0</span>
-                </button>
+    <nav class="bg-white shadow-lg">
+        <div class="container py-3">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-gray-800">随心选</h1>
+                <div class="flex items-center space-x-4">
+                    <a href="#" class="text-gray-600 hover:text-blue-600">首页</a>
+                    <a href="#" class="text-gray-600 hover:text-blue-600">人气推荐</a>
+                    <a href="#" class="text-gray-600 hover:text-blue-600">我的收藏</a>
+                    <input type="text" id="search-input" placeholder="搜索商品" 
+                           class="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button id="cart-button" class="relative text-gray-600 hover:text-blue-600">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span id="cart-count" class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1 py-0.5">0</span>
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
 
-    <!-- 商品列表 -->
-    <main class="container mx-auto px-4 py-8">
+    <main class="container py-8">
         <h2 class="text-2xl font-bold text-gray-800 mb-4">商品列表</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="product-list">
-            <div class="bg-white rounded-lg shadow-md p-4" data-product-name="商品1">
-                <img src="https://picsum.photos/200/300" alt="商品1" class="w-full h-48 object-cover rounded-md mb-4">
-                <h3 class="text-lg font-bold text-gray-800 mb-2">商品1</h3>
-                <p class="text-gray-600 mb-4">这是商品1的描述信息。</p>
-                <p class="text-xl font-bold text-green-500 mb-4">￥100</p>
-                <button onclick="addToCart(1, '商品1', 100)" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">加入购物车</button>
+        <div id="product-list">
+            <div class="product-item bg-white p-4 rounded-lg overflow-hidden">
+                <img src="https://pic5.40017.cn/i/ori/1ClTstwUIG4.png" alt="灰色休闲T恤" class="w-full h-48 object-cover rounded-md mb-4">
+                <h3 class="text-lg font-bold text-gray-800 mb-2">灰色休闲T恤</h3>
+                <p class="text-gray-600 mb-4">简约百搭，舒适面料</p>
+                <div class="flex justify-between items-center">
+                    <span class="text-xl font-bold text-green-500">￥129</span>
+                    <button onclick="addToCart(1, '灰色休闲T恤', 129, 'https://pic5.40017.cn/i/ori/1ClTstwUIG4.png')" 
+                            class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
+                        加入购物车
+                    </button>
+                </div>
             </div>
-            <div class="bg-white rounded-lg shadow-md p-4" data-product-name="商品2">
-                <img src="https://picsum.photos/200/300" alt="商品2" class="w-full h-48 object-cover rounded-md mb-4">
-                <h3 class="text-lg font-bold text-gray-800 mb-2">商品2</h3>
-                <p class="text-gray-600 mb-4">这是商品2的描述信息。</p>
-                <p class="text-xl font-bold text-green-500 mb-4">￥200</p>
-                <button onclick="addToCart(2, '商品2', 200)" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">加入购物车</button>
+            <div class="product-item bg-white p-4 rounded-lg overflow-hidden">
+                <img src="https://pic5.40017.cn/i/ori/1ClTstwUIG4.png" alt="黑色基础款T恤" class="w-full h-48 object-cover rounded-md mb-4">
+                <h3 class="text-lg font-bold text-gray-800 mb-2">黑色基础款T恤</h3>
+                <p class="text-gray-600 mb-4">经典百搭，日常必备</p>
+                <div class="flex justify-between items-center">
+                    <span class="text-xl font-bold text-green-500">￥119</span>
+                    <button onclick="addToCart(2, '黑色基础款T恤', 119, 'https://pic5.40017.cn/i/ori/1ClTstwUIG4.png')" 
+                            class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
+                        加入购物车
+                    </button>
+                </div>
             </div>
-            <div class="bg-white rounded-lg shadow-md p-4" data-product-name="商品3">
-                <img src="https://picsum.photos/200/300" alt="商品3" class="w-full h-48 object-cover rounded-md mb-4">
-                <h3 class="text-lg font-bold text-gray-800 mb-2">商品3</h3>
-                <p class="text-gray-600 mb-4">这是商品3的描述信息。</p>
-                <p class="text-xl font-bold text-green-500 mb-4">￥300</p>
-                <button onclick="addToCart(3, '商品3', 300)" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">加入购物车</button>
+            <div class="product-item bg-white p-4 rounded-lg overflow-hidden">
+                <img src="https://pic5.40017.cn/i/ori/1ClTstwUIG4.png" alt="黑色口袋T恤" class="w-full h-48 object-cover rounded-md mb-4">
+                <h3 class="text-lg font-bold text-gray-800 mb-2">黑色口袋T恤</h3>
+                <p class="text-gray-600 mb-4">口袋设计，休闲时尚</p>
+                <div class="flex justify-between items-center">
+                    <span class="text-xl font-bold text-green-500">￥139</span>
+                    <button onclick="addToCart(3, '黑色口袋T恤', 139, 'https://pic5.40017.cn/i/ori/1ClTstwUIG4.png')" 
+                            class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
+                        加入购物车
+                    </button>
+                </div>
+            </div>
+            <div class="product-item bg-white p-4 rounded-lg overflow-hidden">
+                <img src="https://pic5.40017.cn/i/ori/1ClTstwUIG4.png" alt="黑色印花T恤" class="w-full h-48 object-cover rounded-md mb-4">
+                <h3 class="text-lg font-bold text-gray-800 mb-2">黑色印花T恤</h3>
+                <p class="text-gray-600 mb-4">个性印花，潮流设计</p>
+                <div class="flex justify-between items-center">
+                    <span class="text-xl font-bold text-green-500">￥149</span>
+                    <button onclick="addToCart(4, '黑色印花T恤', 149, 'https://pic5.40017.cn/i/ori/1ClTstwUIG4.png')" 
+                            class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
+                        加入购物车
+                    </button>
+                </div>
+            </div>
+            <div class="product-item bg-white p-4 rounded-lg overflow-hidden">
+                <img src="https://pic5.40017.cn/i/ori/1ClTstwUIG4.png" alt="蓝色卡通T恤" class="w-full h-48 object-cover rounded-md mb-4">
+                <h3 class="text-lg font-bold text-gray-800 mb-2">蓝色卡通T恤</h3>
+                <p class="text-gray-600 mb-4">可爱印花，清新甜美</p>
+                <div class="flex justify-between items-center">
+                    <span class="text-xl font-bold text-green-500">￥159</span>
+                    <button onclick="addToCart(5, '蓝色卡通T恤', 159, 'https://pic5.40017.cn/i/ori/1ClTstwUIG4.png')" 
+                            class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
+                        加入购物车
+                    </button>
+                </div>
+            </div>
+            <div class="product-item bg-white p-4 rounded-lg overflow-hidden">
+                <img src="https://pic5.40017.cn/i/ori/1ClTstwUIG4.png" alt="白色卡通T恤" class="w-full h-48 object-cover rounded-md mb-4">
+                <h3 class="text-lg font-bold text-gray-800 mb-2">白色卡通T恤</h3>
+                <p class="text-gray-600 mb-4">趣味图案，甜美可爱</p>
+                <div class="flex justify-between items-center">
+                    <span class="text-xl font-bold text-green-500">￥139</span>
+                    <button onclick="addToCart(6, '白色卡通T恤', 139, 'https://pic5.40017.cn/i/ori/1ClTstwUIG4.png')" 
+                            class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
+                        加入购物车
+                    </button>
+                </div>
             </div>
         </div>
-        <p id="no-results" class="text-red-500 hidden">未找到匹配的商品。</p>
+        <p id="no-results" class="text-red-500 mt-4 hidden">未找到匹配的商品。</p>
         <div id="pagination" class="flex justify-center mt-4 hidden">
             <button id="prev-page" class="bg-gray-300 text-gray-700 py-2 px-4 rounded-md mr-2 disabled">上一页</button>
             <span id="page-info"></span>
@@ -90,104 +194,74 @@
         </div>
     </main>
 
-    <!-- 购物车模态框 -->
-    <div id="cart-modal" class="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 hidden justify-center items-center">
-        <div class="bg-white rounded-lg shadow-md p-8 w-96">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">购物车</h2>
-            <ul id="cart-items" class="mb-4">
-                <!-- 购物车商品列表将通过 JavaScript 动态添加 -->
-            </ul>
-            <p class="text-xl font-bold text-gray-800 mb-4">总价: <span id="cart-total">￥0</span></p>
-            <div class="flex justify-between">
-                <button id="close-cart-modal" class="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600">关闭</button>
-                <button onclick="checkout()" class="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600">结算</button>
+    <div id="cart-modal" class="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl mx-4 md:mx-12 lg:mx-24 xl:mx-48 p-6 md:p-8 lg:p-12">
+            <h2 class="font-bold text-xl mb-4">购物车</h2>
+            <div id="cart-items" class="max-h-96 overflow-y-auto"></div>
+            <div class="mt-6 border-t border-gray-200 pt-4">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="font-bold text-lg">总价：</span>
+                    <span id="cart-total" class="font-bold text-xl text-blue-600">￥0</span>
+                </div>
+                <button onclick="checkout()" class="w-full bg-green-600 text-white px-6 py-3 rounded-full mt-4 hover:bg-green-700">
+                    去结算
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- 订单查询页面（简单示例） -->
-    <div id="orders-page" class="container mx-auto px-4 py-8 hidden">
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">我的订单</h2>
-        <ul id="order-list">
-            <!-- 订单列表将通过 JavaScript 动态添加 -->
-        </ul>
-    </div>
-
     <script>
-        const cart = [];
-        const cartCountElement = document.getElementById('cart-count');
-        const cartItemsElement = document.getElementById('cart-items');
-        const cartTotalElement = document.getElementById('cart-total');
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const cartCount = document.getElementById('cart-count');
+        const cartTotal = document.getElementById('cart-total');
+        const cartItems = document.getElementById('cart-items');
         const cartModal = document.getElementById('cart-modal');
-        const closeCartModalButton = document.getElementById('close-cart-modal');
-        const orderListElement = document.getElementById('order-list');
-        const cartButton = document.getElementById('cart-button');
-        const searchInput = document.getElementById('search-input');
-        const productList = document.getElementById('product-list');
-        const noResults = document.getElementById('no-results');
-        const pagination = document.getElementById('pagination');
-        const prevPageButton = document.getElementById('prev-page');
-        const nextPageButton = document.getElementById('next-page');
-        const pageInfo = document.getElementById('page-info');
 
-        const itemsPerPage = 2; // 每页显示的商品数量
-        let currentPage = 1;
-        let searchResults = [];
-
-        function addToCart(id, name, price) {
+        function addToCart(id, name, price, image) {
             const existingItem = cart.find(item => item.id === id);
             if (existingItem) {
                 existingItem.quantity++;
             } else {
-                cart.push({ id, name, price, quantity: 1 });
+                cart.push({ id, name, price, quantity: 1, image });
             }
             updateCart();
         }
 
         function updateCart() {
-            let total = 0;
-            let itemCount = 0;
-            cartItemsElement.innerHTML = '';
-            cart.forEach(item => {
-                const li = document.createElement('li');
-                li.classList.add('flex', 'justify-between', 'items-center', 'mb-2');
-                li.innerHTML = `
-                    <div>
-                        <p class="text-gray-800">${item.name}</p>
-                        <p class="text-gray-600">￥${item.price} x ${item.quantity}</p>
+            cartCount.textContent = cart.reduce((acc, item) => acc + item.quantity, 0);
+            cartTotal.textContent = `￥${cart.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2)}`;
+            
+            cartItems.innerHTML = cart.map(item => `
+                <div class="flex items-center justify-between p-3 border-b border-gray-200">
+                    <div class="flex items-center space-x-4">
+                        <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg">
+                        <div>
+                            <h4 class="font-medium">${item.name}</h4>
+                            <p class="text-sm text-gray-500">￥${item.price} × ${item.quantity}</p>
+                        </div>
                     </div>
-                    <div>
-                        <button onclick="decreaseQuantity(${item.id})" class="text-gray-600 hover:text-gray-800">-</button>
-                        <span class="mx-2">${item.quantity}</span>
-                        <button onclick="increaseQuantity(${item.id})" class="text-gray-600 hover:text-gray-800">+</button>
+                    <div class="flex items-center space-x-4">
+                        <button onclick="decreaseQuantity(${item.id})" class="px-2 py-1 rounded-md border text-gray-500 hover:text-red-500">-</button>
+                        <span>${item.quantity}</span>
+                        <button onclick="increaseQuantity(${item.id})" class="px-2 py-1 rounded-md border text-gray-500 hover:text-green-500">+</button>
                     </div>
-                `;
-                cartItemsElement.appendChild(li);
-                total += item.price * item.quantity;
-                itemCount += item.quantity;
-            });
-            cartTotalElement.textContent = `￥${total}`;
-            cartCountElement.textContent = itemCount;
+                </div>
+            `).join('');
+            
+            localStorage.setItem('cart', JSON.stringify(cart));
         }
 
         function increaseQuantity(id) {
             const item = cart.find(item => item.id === id);
-            if (item) {
-                item.quantity++;
-                updateCart();
-            }
+            if (item) item.quantity++;
+            updateCart();
         }
 
         function decreaseQuantity(id) {
             const item = cart.find(item => item.id === id);
-            if (item && item.quantity > 1) {
-                item.quantity--;
-                updateCart();
-            } else if (item && item.quantity === 1) {
-                const index = cart.indexOf(item);
-                cart.splice(index, 1);
-                updateCart();
-            }
+            if (item && item.quantity > 1) item.quantity--;
+            else if (item) cart.splice(cart.indexOf(item), 1);
+            updateCart();
         }
 
         function checkout() {
@@ -195,24 +269,9 @@
                 alert('购物车为空，无法结算！');
                 return;
             }
-            const order = {
-                items: [...cart],
-                total: parseFloat(cartTotalElement.textContent.replace('￥', ''))
-            };
-            // 这里可以添加保存订单到本地存储或发送到服务器的逻辑
-            const li = document.createElement('li');
-            li.classList.add('bg-white', 'rounded-lg', 'shadow-md', 'p-4', 'mb-4');
-            let orderDetails = '';
-            order.items.forEach(item => {
-                orderDetails += `${item.name} x ${item.quantity}, `;
-            });
-            orderDetails += `总价: ￥${order.total}`;
-            li.textContent = orderDetails;
-            orderListElement.appendChild(li);
+            alert('结算成功！');
             cart.length = 0;
             updateCart();
-            closeCartModal();
-            alert('结算成功！');
         }
 
         function openCartModal() {
@@ -223,83 +282,9 @@
             cartModal.classList.add('hidden');
         }
 
-        cartButton.addEventListener('click', openCartModal);
-        closeCartModalButton.addEventListener('click', closeCartModal);
-
-        function searchProducts() {
-            const searchTerm = searchInput.value.trim().toLowerCase();
-            const products = Array.from(productList.querySelectorAll('[data-product-name]'));
-            searchResults = products.filter(product => {
-                const productName = product.dataset.productName.toLowerCase();
-                return productName.includes(searchTerm);
-            });
-
-            currentPage = 1;
-            showPage();
-        }
-
-        function showPage() {
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const currentPageItems = searchResults.slice(startIndex, endIndex);
-
-            const allProducts = productList.querySelectorAll('[data-product-name]');
-            allProducts.forEach(product => {
-                product.style.display = 'none';
-            });
-
-            currentPageItems.forEach(product => {
-                product.style.display = 'block';
-            });
-
-            const totalPages = Math.ceil(searchResults.length / itemsPerPage);
-            pageInfo.textContent = `第 ${currentPage} 页，共 ${totalPages} 页`;
-
-            if (currentPage === 1) {
-                prevPageButton.disabled = true;
-            } else {
-                prevPageButton.disabled = false;
-            }
-
-            if (currentPage === totalPages) {
-                nextPageButton.disabled = true;
-            } else {
-                nextPageButton.disabled = false;
-            }
-
-            if (searchResults.length > 0) {
-                pagination.classList.remove('hidden');
-                noResults.classList.add('hidden');
-            } else {
-                pagination.classList.add('hidden');
-                noResults.classList.remove('hidden');
-            }
-        }
-
-        function prevPage() {
-            if (currentPage > 1) {
-                currentPage--;
-                showPage();
-            }
-        }
-
-        function nextPage() {
-            const totalPages = Math.ceil(searchResults.length / itemsPerPage);
-            if (currentPage < totalPages) {
-                currentPage++;
-                showPage();
-            }
-        }
-
-        searchInput.addEventListener('keyup', function (event) {
-            if (event.key === 'Enter') {
-                searchProducts();
-            }
-        });
-
-        prevPageButton.addEventListener('click', prevPage);
-        nextPageButton.addEventListener('click', nextPage);
+        document.getElementById('cart-button').addEventListener('click', openCartModal);
+        document.getElementById('close-cart-modal').addEventListener('click', closeCartModal);
     </script>
 </body>
 
-</html>    
+</html> 
