@@ -20,6 +20,18 @@
             text-align: center;
         }
 
+        @media (max-width: 640px) {
+            .banner {
+                height: 250px;
+            }
+            .banner h2 {
+                font-size: 1.8rem !important;
+            }
+            .banner p {
+                font-size: 1rem !important;
+            }
+        }
+
         .banner h2 {
             font-size: 3rem;
             margin-bottom: 1rem;
@@ -51,18 +63,30 @@
         }
 
         #product-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            justify-content: flex-start;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 1024px) {
+            #product-list {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            #product-list {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
         }
 
         .product-item {
-            flex-basis: calc((100% - 2rem) / 3);
-            margin-bottom: 1rem;
+            background: white;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
         }
 
         .product-item:hover {
@@ -70,15 +94,72 @@
             box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
         }
 
+        .mobile-menu-button {
+            display: none;
+        }
+
         @media (max-width: 768px) {
-            .product-item {
-                flex-basis: calc((100% - 1rem) / 2);
+            .mobile-menu-button {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                width: 100%;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                background: white;
+                padding: 1rem;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+
+            .nav-links.active {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .search-cart-section {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            .search-cart-section input {
+                width: 120px;
             }
         }
 
-        @media (max-width: 480px) {
-            .product-item {
-                flex-basis: 100%;
+        /* 购物车样式优化 */
+        @media (max-width: 640px) {
+            .cart-content {
+                width: 90% !important;
+                margin: 1rem auto !important;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+
+            .cart-item {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .cart-item-details {
+                width: 100%;
+            }
+
+            .cart-item img {
+                width: 100%;
+                height: auto;
+            }
+        }
+
+        /* 按钮样式优化 */
+        @media (max-width: 640px) {
+            .product-item button {
+                width: 100%;
+                padding: 0.75rem;
             }
         }
     </style>
@@ -91,19 +172,34 @@
             <p class="text-lg text-gray-300">发现生活中的小确幸</p>
         </div>
     </div>
-    <nav class="bg-white shadow-lg">
-        <div class="container py-3">
-            <div class="flex justify-between items-center">
+    
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="container">
+            <div class="flex items-center justify-between py-4">
                 <h1 class="text-2xl font-bold text-gray-800">随心选</h1>
-                <div class="flex items-center space-x-4">
+                
+                <button class="mobile-menu-button md:hidden">
+                    <i class="fas fa-bars text-gray-600 text-xl"></i>
+                </button>
+
+                <div class="nav-links hidden md:flex items-center space-x-8">
                     <a href="#" class="text-gray-600 hover:text-blue-600">首页</a>
                     <a href="#" class="text-gray-600 hover:text-blue-600">人气推荐</a>
                     <a href="#" class="text-gray-600 hover:text-blue-600">我的收藏</a>
-                    <input type="text" id="search-input" placeholder="搜索商品" 
-                           class="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div class="search-cart-section flex items-center space-x-4">
+                    <div class="relative">
+                        <input type="text" id="search-input" 
+                               placeholder="搜索商品" 
+                               class="w-full md:w-auto border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
                     <button id="cart-button" class="relative text-gray-600 hover:text-blue-600">
-                        <i class="fa-solid fa-cart-shopping"></i>
-                        <span id="cart-count" class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1 py-0.5">0</span>
+                        <i class="fa-solid fa-cart-shopping text-xl"></i>
+                        <span id="cart-count" 
+                              class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                            0
+                        </span>
                     </button>
                 </div>
             </div>
@@ -111,8 +207,8 @@
     </nav>
 
     <main class="container py-8">
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">商品列表</h2>
-        <div id="product-list">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">商品列表</h2>
+        <div id="product-list" class="mb-8">
             <div class="product-item bg-white p-4 rounded-lg overflow-hidden">
                 <img src="https://pic5.40017.cn/i/ori/1ClTstwUIG4.png" alt="灰色休闲T恤" class="w-full h-48 object-cover rounded-md mb-4">
                 <h3 class="text-lg font-bold text-gray-800 mb-2">灰色休闲T恤</h3>
@@ -194,16 +290,24 @@
         </div>
     </main>
 
-    <div id="cart-modal" class="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 hidden">
-        <div class="bg-white rounded-lg shadow-xl mx-4 md:mx-12 lg:mx-24 xl:mx-48 p-6 md:p-8 lg:p-12">
-            <h2 class="font-bold text-xl mb-4">购物车</h2>
-            <div id="cart-items" class="max-h-96 overflow-y-auto"></div>
+    <div id="cart-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 hidden">
+        <div class="cart-content bg-white rounded-lg shadow-xl mx-auto my-8 p-6 max-w-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">购物车</h2>
+                <button onclick="closeCartModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div id="cart-items" class="max-h-[60vh] overflow-y-auto"></div>
+            
             <div class="mt-6 border-t border-gray-200 pt-4">
                 <div class="flex justify-between items-center mb-4">
-                    <span class="font-bold text-lg">总价：</span>
-                    <span id="cart-total" class="font-bold text-xl text-blue-600">￥0</span>
+                    <span class="text-lg font-bold">总价：</span>
+                    <span id="cart-total" class="text-xl font-bold text-blue-600">￥0</span>
                 </div>
-                <button onclick="checkout()" class="w-full bg-green-600 text-white px-6 py-3 rounded-full mt-4 hover:bg-green-700">
+                <button onclick="checkout()" 
+                        class="w-full bg-green-600 text-white px-6 py-3 rounded-full hover:bg-green-700 transition-colors">
                     去结算
                 </button>
             </div>
@@ -211,6 +315,19 @@
     </div>
 
     <script>
+        // 移动端菜单控制
+        document.querySelector('.mobile-menu-button').addEventListener('click', function() {
+            document.querySelector('.nav-links').classList.toggle('active');
+        });
+
+        // 点击页面其他地方关闭移动端菜单
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.mobile-menu-button') && !e.target.closest('.nav-links')) {
+                document.querySelector('.nav-links').classList.remove('active');
+            }
+        });
+
+        // 现有的购物车脚本保持不变
         const cart = JSON.parse(localStorage.getItem('cart')) || [];
         const cartCount = document.getElementById('cart-count');
         const cartTotal = document.getElementById('cart-total');
@@ -232,18 +349,24 @@
             cartTotal.textContent = `￥${cart.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2)}`;
             
             cartItems.innerHTML = cart.map(item => `
-                <div class="flex items-center justify-between p-3 border-b border-gray-200">
-                    <div class="flex items-center space-x-4">
+                <div class="cart-item flex items-center justify-between p-4 border-b border-gray-200">
+                    <div class="cart-item-details flex items-center space-x-4">
                         <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg">
                         <div>
                             <h4 class="font-medium">${item.name}</h4>
                             <p class="text-sm text-gray-500">￥${item.price} × ${item.quantity}</p>
                         </div>
                     </div>
-                    <div class="flex items-center space-x-4">
-                        <button onclick="decreaseQuantity(${item.id})" class="px-2 py-1 rounded-md border text-gray-500 hover:text-red-500">-</button>
-                        <span>${item.quantity}</span>
-                        <button onclick="increaseQuantity(${item.id})" class="px-2 py-1 rounded-md border text-gray-500 hover:text-green-500">+</button>
+                    <div class="flex items-center space-x-3">
+                        <button onclick="decreaseQuantity(${item.id})" 
+                                class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100">
+                            <i class="fas fa-minus text-sm"></i>
+                        </button>
+                        <span class="w-8 text-center">${item.quantity}</span>
+                        <button onclick="increaseQuantity(${item.id})" 
+                                class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100">
+                            <i class="fas fa-plus text-sm"></i>
+                        </button>
                     </div>
                 </div>
             `).join('');
@@ -272,18 +395,30 @@
             alert('结算成功！');
             cart.length = 0;
             updateCart();
+            closeCartModal();
         }
 
         function openCartModal() {
             cartModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
         }
 
         function closeCartModal() {
             cartModal.classList.add('hidden');
+            document.body.style.overflow = '';
         }
 
         document.getElementById('cart-button').addEventListener('click', openCartModal);
-        document.getElementById('close-cart-modal').addEventListener('click', closeCartModal);
+
+        // 点击模态框外部关闭
+        cartModal.addEventListener('click', (e) => {
+            if (e.target === cartModal) {
+                closeCartModal();
+            }
+        });
+
+        // 初始化购物车显示
+        updateCart();
     </script>
 </body>
 
