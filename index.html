@@ -76,8 +76,31 @@
 
         @media (max-width: 640px) {
             #product-list {
-                grid-template-columns: 1fr;
-                gap: 1rem;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+            
+            .product-item {
+                padding: 0.75rem;
+            }
+            
+            .product-item img {
+                height: 160px;
+            }
+            
+            .product-item h3 {
+                font-size: 1rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .product-item p {
+                font-size: 0.875rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .product-item button {
+                padding: 0.5rem;
+                font-size: 0.875rem;
             }
         }
 
@@ -186,6 +209,13 @@
                     <a href="#" class="text-gray-600 hover:text-blue-600">首页</a>
                     <a href="#" class="text-gray-600 hover:text-blue-600">人气推荐</a>
                     <a href="#" class="text-gray-600 hover:text-blue-600">我的收藏</a>
+                    <button onclick="openOrderQuery()" class="text-gray-600 hover:text-blue-600">订单查询</button>
+                    <button onclick="openLoginModal()" id="login-button" class="text-gray-600 hover:text-blue-600">登录</button>
+                    <span id="user-info" class="hidden">
+                        <span class="text-gray-600">欢迎，</span>
+                        <span id="user-phone" class="font-medium"></span>
+                        <button onclick="logout()" class="ml-2 text-red-500 hover:text-red-700">退出</button>
+                    </span>
                 </div>
 
                 <div class="search-cart-section flex items-center space-x-4">
@@ -306,10 +336,106 @@
                     <span class="text-lg font-bold">总价：</span>
                     <span id="cart-total" class="text-xl font-bold text-blue-600">￥0</span>
                 </div>
-                <button onclick="checkout()" 
+                
+                <!-- 结算表单 -->
+                <div id="checkout-form" class="hidden">
+                    <h3 class="text-lg font-bold mb-4">填写收货信息</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">收货人姓名</label>
+                            <input type="text" id="receiver-name" class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">联系电话</label>
+                            <input type="tel" id="receiver-phone" class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">收货地址</label>
+                            <textarea id="receiver-address" class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3" required></textarea>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-4 mt-6">
+                        <button onclick="cancelCheckout()" class="px-4 py-2 border rounded-lg hover:bg-gray-100">取消</button>
+                        <button onclick="submitOrder()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">提交订单</button>
+                    </div>
+                </div>
+
+                <button onclick="startCheckout()" 
                         class="w-full bg-green-600 text-white px-6 py-3 rounded-full hover:bg-green-700 transition-colors">
                     去结算
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 登录模态框 -->
+    <div id="login-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 hidden">
+        <div class="login-content bg-white rounded-lg shadow-xl mx-auto my-8 p-6 max-w-md">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">用户登录</h2>
+                <button onclick="closeLoginModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">姓名</label>
+                    <input type="text" id="login-name" 
+                           placeholder="请输入姓名" 
+                           class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">手机号码</label>
+                    <input type="tel" id="login-phone" 
+                           placeholder="请输入手机号码" 
+                           class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button onclick="login()" 
+                        class="w-full bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">
+                    登录
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 订单查询模态框 -->
+    <div id="order-query-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 hidden">
+        <div class="order-query-content bg-white rounded-lg shadow-xl mx-auto my-8 p-6 max-w-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">订单查询</h2>
+                <button onclick="closeOrderQuery()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div id="order-status-result" class="hidden">
+                <div class="border rounded-lg p-4 mb-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold">订单信息</h3>
+                        <span id="order-status" class="px-3 py-1 rounded-full text-sm"></span>
+                    </div>
+                    <div class="space-y-2">
+                        <p><span class="font-medium">订单号：</span><span id="order-id"></span></p>
+                        <p><span class="font-medium">下单时间：</span><span id="order-time"></span></p>
+                        <p><span class="font-medium">收货人：</span><span id="order-receiver"></span></p>
+                        <p><span class="font-medium">联系电话：</span><span id="order-phone"></span></p>
+                        <p><span class="font-medium">收货地址：</span><span id="order-address"></span></p>
+                    </div>
+                </div>
+
+                <div class="border rounded-lg p-4">
+                    <h3 class="text-lg font-bold mb-4">商品信息</h3>
+                    <div id="order-items" class="space-y-4"></div>
+                    <div class="mt-4 pt-4 border-t">
+                        <p class="text-right font-bold">总金额：<span id="order-total" class="text-blue-600"></span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="no-order-found" class="hidden text-center py-8">
+                <i class="fas fa-search text-4xl text-gray-400 mb-4"></i>
+                <p class="text-gray-600">未找到相关订单信息</p>
             </div>
         </div>
     </div>
@@ -387,13 +513,48 @@
             updateCart();
         }
 
-        function checkout() {
+        function startCheckout() {
             if (cart.length === 0) {
-                alert('购物车为空，无法结算！');
+                alert('购物车为空！');
                 return;
             }
-            alert('结算成功！');
+            document.getElementById('checkout-form').classList.remove('hidden');
+            document.querySelector('button[onclick="startCheckout()"]').classList.add('hidden');
+        }
+
+        function cancelCheckout() {
+            document.getElementById('checkout-form').classList.add('hidden');
+            document.querySelector('button[onclick="startCheckout()"]').classList.remove('hidden');
+        }
+
+        function submitOrder() {
+            const name = document.getElementById('receiver-name').value;
+            const phone = document.getElementById('receiver-phone').value;
+            const address = document.getElementById('receiver-address').value;
+
+            if (!name || !phone || !address) {
+                alert('请填写完整的收货信息！');
+                return;
+            }
+
+            // 这里可以添加订单提交逻辑
+            const orderData = {
+                items: cart,
+                shippingInfo: {
+                    name,
+                    phone,
+                    address,
+                },
+                total: cart.reduce((acc, item) => acc + item.price * item.quantity, 0)
+            };
+
+            // 模拟订单提交
+            alert('订单提交成功！');
+            console.log('订单信息：', orderData);
+            
+            // 清空购物车
             cart.length = 0;
+            localStorage.setItem('cart', JSON.stringify(cart));
             updateCart();
             closeCartModal();
         }
@@ -419,6 +580,163 @@
 
         // 初始化购物车显示
         updateCart();
+
+        // 用户登录相关函数
+        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+
+        function updateUserUI() {
+            const loginButton = document.getElementById('login-button');
+            const userInfo = document.getElementById('user-info');
+            const userPhone = document.getElementById('user-phone');
+
+            if (currentUser) {
+                loginButton.classList.add('hidden');
+                userInfo.classList.remove('hidden');
+                userPhone.textContent = currentUser.name;
+            } else {
+                loginButton.classList.remove('hidden');
+                userInfo.classList.add('hidden');
+            }
+        }
+
+        function openLoginModal() {
+            document.getElementById('login-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLoginModal() {
+            document.getElementById('login-modal').classList.add('hidden');
+            document.body.style.overflow = '';
+            document.getElementById('login-name').value = '';
+            document.getElementById('login-phone').value = '';
+        }
+
+        function login() {
+            const name = document.getElementById('login-name').value.trim();
+            const phone = document.getElementById('login-phone').value.trim();
+
+            if (!name) {
+                alert('请输入姓名');
+                return;
+            }
+
+            if (!phone || !/^1[3-9]\d{9}$/.test(phone)) {
+                alert('请输入正确的手机号码');
+                return;
+            }
+
+            // 模拟登录成功
+            currentUser = {
+                name: name,
+                phone: phone
+            };
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            updateUserUI();
+            closeLoginModal();
+            alert('登录成功！');
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            updateUserUI();
+            alert('已退出登录');
+        }
+
+        // 修改订单查询函数
+        function openOrderQuery() {
+            if (!currentUser) {
+                alert('请先登录');
+                openLoginModal();
+                return;
+            }
+            document.getElementById('order-query-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            queryOrder();
+        }
+
+        function closeOrderQuery() {
+            document.getElementById('order-query-modal').classList.add('hidden');
+            document.body.style.overflow = '';
+            document.getElementById('order-status-result').classList.add('hidden');
+            document.getElementById('no-order-found').classList.add('hidden');
+        }
+
+        function queryOrder() {
+            if (!currentUser) {
+                alert('请先登录');
+                openLoginModal();
+                return;
+            }
+
+            const phone = currentUser.phone;
+
+            // 模拟订单查询
+            const mockOrder = {
+                id: 'ORD' + Date.now(),
+                time: new Date().toLocaleString(),
+                status: '已发货',
+                receiver: '张三',
+                phone: phone,
+                address: '北京市朝阳区xxx街道xxx号',
+                items: [
+                    { name: '灰色休闲T恤', price: 129, quantity: 2 },
+                    { name: '黑色基础款T恤', price: 119, quantity: 1 }
+                ]
+            };
+
+            // 显示订单信息
+            document.getElementById('order-id').textContent = mockOrder.id;
+            document.getElementById('order-time').textContent = mockOrder.time;
+            document.getElementById('order-status').textContent = mockOrder.status;
+            document.getElementById('order-receiver').textContent = mockOrder.receiver;
+            document.getElementById('order-phone').textContent = mockOrder.phone;
+            document.getElementById('order-address').textContent = mockOrder.address;
+
+            // 显示商品信息
+            const orderItems = document.getElementById('order-items');
+            orderItems.innerHTML = mockOrder.items.map(item => `
+                <div class="flex justify-between items-center">
+                    <span>${item.name}</span>
+                    <span>￥${item.price} × ${item.quantity}</span>
+                </div>
+            `).join('');
+
+            // 计算并显示总金额
+            const total = mockOrder.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+            document.getElementById('order-total').textContent = `￥${total}`;
+
+            // 显示结果
+            document.getElementById('order-status-result').classList.remove('hidden');
+            document.getElementById('no-order-found').classList.add('hidden');
+
+            // 根据订单状态设置样式
+            const statusElement = document.getElementById('order-status');
+            statusElement.className = 'px-3 py-1 rounded-full text-sm';
+            switch (mockOrder.status) {
+                case '待付款':
+                    statusElement.classList.add('bg-yellow-100', 'text-yellow-800');
+                    break;
+                case '已发货':
+                    statusElement.classList.add('bg-blue-100', 'text-blue-800');
+                    break;
+                case '已完成':
+                    statusElement.classList.add('bg-green-100', 'text-green-800');
+                    break;
+                default:
+                    statusElement.classList.add('bg-gray-100', 'text-gray-800');
+            }
+        }
+
+        // 初始化用户界面
+        updateUserUI();
+
+        // 点击模态框外部关闭
+        document.getElementById('order-query-modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('order-query-modal')) {
+                closeOrderQuery();
+            }
+        });
     </script>
 </body>
 
