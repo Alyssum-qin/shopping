@@ -185,6 +185,126 @@
                 padding: 0.75rem;
             }
         }
+
+        /* 添加客服相关样式 */
+        .customer-service {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+
+        .customer-service-button {
+            width: 60px;
+            height: 60px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+        }
+
+        .customer-service-button:hover {
+            transform: scale(1.1);
+        }
+
+        .customer-service-button i {
+            color: white;
+            font-size: 24px;
+        }
+
+        .customer-service-dialog {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 300px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            display: none;
+        }
+
+        .customer-service-dialog.active {
+            display: block;
+        }
+
+        .customer-service-header {
+            padding: 15px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .customer-service-content {
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .customer-service-input {
+            padding: 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+
+        .customer-service-input input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .customer-service-input button {
+            padding: 8px 15px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+
+        .message.user {
+            background: #e3f2fd;
+            margin-left: auto;
+        }
+
+        .message.service {
+            background: #f5f5f5;
+            margin-right: auto;
+        }
+
+        @media (max-width: 640px) {
+            .customer-service {
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .customer-service-button {
+                width: 50px;
+                height: 50px;
+            }
+
+            .customer-service-dialog {
+                bottom: 80px;
+                right: 20px;
+                width: 280px;
+            }
+        }
     </style>
 </head>
 
@@ -222,93 +342,30 @@
                                placeholder="搜索商品" 
                                class="w-full md:w-auto border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
-                    <button id="cart-button" class="relative text-gray-600 hover:text-blue-600">
+                    <a href="cart.html" id="cart-button" class="relative text-gray-600 hover:text-blue-600">
                         <i class="fa-solid fa-cart-shopping text-xl"></i>
                         <span id="cart-count" 
                               class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                             0
                         </span>
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
     </nav>
 
     <main class="container py-8">
+        <!-- 添加分类导航 -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">商品分类</h2>
+            <div class="flex flex-wrap gap-4" id="category-buttons">
+                <!-- 分类按钮将通过 JavaScript 动态加载 -->
+            </div>
+        </div>
+
         <h2 class="text-2xl font-bold text-gray-800 mb-6">商品列表</h2>
         <div id="product-list" class="mb-8">
-            <div class="product-item bg-white p-4 rounded-lg overflow-hidden">
-                <img src="https://pic5.40017.cn/i/ori/1ClTstwUIG4.png" alt="灰色休闲T恤" class="w-full h-48 object-cover rounded-md mb-4">
-                <h3 class="text-lg font-bold text-gray-800 mb-2">灰色休闲T恤</h3>
-                <p class="text-gray-600 mb-4">简约百搭，舒适面料</p>
-                <div class="flex justify-between items-center">
-                    <span class="text-xl font-bold text-green-500">￥129</span>
-                    <button onclick="addToCart(1, '灰色休闲T恤', 129, 'https://pic5.40017.cn/i/ori/1ClTstwUIG4.png')" 
-                            class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
-                        加入购物车
-                    </button>
-                </div>
-            </div>
-            <div class="product-item bg-white p-4 rounded-lg overflow-hidden">
-                <img src="https://pic5.40017.cn/i/ori/1ClTstwUIG4.png" alt="黑色基础款T恤" class="w-full h-48 object-cover rounded-md mb-4">
-                <h3 class="text-lg font-bold text-gray-800 mb-2">黑色基础款T恤</h3>
-                <p class="text-gray-600 mb-4">经典百搭，日常必备</p>
-                <div class="flex justify-between items-center">
-                    <span class="text-xl font-bold text-green-500">￥119</span>
-                    <button onclick="addToCart(2, '黑色基础款T恤', 119, 'https://pic5.40017.cn/i/ori/1ClTstwUIG4.png')" 
-                            class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
-                        加入购物车
-                    </button>
-                </div>
-            </div>
-            <div class="product-item bg-white p-4 rounded-lg overflow-hidden">
-                <img src="https://pic5.40017.cn/i/ori/1ClTstwUIG4.png" alt="黑色口袋T恤" class="w-full h-48 object-cover rounded-md mb-4">
-                <h3 class="text-lg font-bold text-gray-800 mb-2">黑色口袋T恤</h3>
-                <p class="text-gray-600 mb-4">口袋设计，休闲时尚</p>
-                <div class="flex justify-between items-center">
-                    <span class="text-xl font-bold text-green-500">￥139</span>
-                    <button onclick="addToCart(3, '黑色口袋T恤', 139, 'https://pic5.40017.cn/i/ori/1ClTstwUIG4.png')" 
-                            class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
-                        加入购物车
-                    </button>
-                </div>
-            </div>
-            <div class="product-item bg-white p-4 rounded-lg overflow-hidden">
-                <img src="https://pic5.40017.cn/i/ori/1ClTstwUIG4.png" alt="黑色印花T恤" class="w-full h-48 object-cover rounded-md mb-4">
-                <h3 class="text-lg font-bold text-gray-800 mb-2">黑色印花T恤</h3>
-                <p class="text-gray-600 mb-4">个性印花，潮流设计</p>
-                <div class="flex justify-between items-center">
-                    <span class="text-xl font-bold text-green-500">￥149</span>
-                    <button onclick="addToCart(4, '黑色印花T恤', 149, 'https://pic5.40017.cn/i/ori/1ClTstwUIG4.png')" 
-                            class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
-                        加入购物车
-                    </button>
-                </div>
-            </div>
-            <div class="product-item bg-white p-4 rounded-lg overflow-hidden">
-                <img src="https://pic5.40017.cn/i/ori/1ClTstwUIG4.png" alt="蓝色卡通T恤" class="w-full h-48 object-cover rounded-md mb-4">
-                <h3 class="text-lg font-bold text-gray-800 mb-2">蓝色卡通T恤</h3>
-                <p class="text-gray-600 mb-4">可爱印花，清新甜美</p>
-                <div class="flex justify-between items-center">
-                    <span class="text-xl font-bold text-green-500">￥159</span>
-                    <button onclick="addToCart(5, '蓝色卡通T恤', 159, 'https://pic5.40017.cn/i/ori/1ClTstwUIG4.png')" 
-                            class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
-                        加入购物车
-                    </button>
-                </div>
-            </div>
-            <div class="product-item bg-white p-4 rounded-lg overflow-hidden">
-                <img src="https://pic5.40017.cn/i/ori/1ClTstwUIG4.png" alt="白色卡通T恤" class="w-full h-48 object-cover rounded-md mb-4">
-                <h3 class="text-lg font-bold text-gray-800 mb-2">白色卡通T恤</h3>
-                <p class="text-gray-600 mb-4">趣味图案，甜美可爱</p>
-                <div class="flex justify-between items-center">
-                    <span class="text-xl font-bold text-green-500">￥139</span>
-                    <button onclick="addToCart(6, '白色卡通T恤', 139, 'https://pic5.40017.cn/i/ori/1ClTstwUIG4.png')" 
-                            class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
-                        加入购物车
-                    </button>
-                </div>
-            </div>
+            <!-- 商品列表将通过 JavaScript 动态加载 -->
         </div>
         <p id="no-results" class="text-red-500 mt-4 hidden">未找到匹配的商品。</p>
         <div id="pagination" class="flex justify-center mt-4 hidden">
@@ -317,54 +374,6 @@
             <button id="next-page" class="bg-gray-300 text-gray-700 py-2 px-4 rounded-md">下一页</button>
         </div>
     </main>
-
-    <div id="cart-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 hidden">
-        <div class="cart-content bg-white rounded-lg shadow-xl mx-auto my-8 p-6 max-w-2xl">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold">购物车</h2>
-                <button onclick="closeCartModal()" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
-            
-            <div id="cart-items" class="max-h-[60vh] overflow-y-auto"></div>
-            
-            <div class="mt-6 border-t border-gray-200 pt-4">
-                <div class="flex justify-between items-center mb-4">
-                    <span class="text-lg font-bold">总价：</span>
-                    <span id="cart-total" class="text-xl font-bold text-blue-600">￥0</span>
-                </div>
-                
-                <!-- 结算表单 -->
-                <div id="checkout-form" class="hidden">
-                    <h3 class="text-lg font-bold mb-4">填写收货信息</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">收货人姓名</label>
-                            <input type="text" id="receiver-name" class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">联系电话</label>
-                            <input type="tel" id="receiver-phone" class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">收货地址</label>
-                            <textarea id="receiver-address" class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3" required></textarea>
-                        </div>
-                    </div>
-                    <div class="flex justify-end space-x-4 mt-6">
-                        <button onclick="cancelCheckout()" class="px-4 py-2 border rounded-lg hover:bg-gray-100">取消</button>
-                        <button onclick="submitOrder()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">提交订单</button>
-                    </div>
-                </div>
-
-                <button onclick="startCheckout()" 
-                        class="w-full bg-green-600 text-white px-6 py-3 rounded-full hover:bg-green-700 transition-colors">
-                    去结算
-                </button>
-            </div>
-        </div>
-    </div>
 
     <!-- 登录模态框 -->
     <div id="login-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 hidden">
@@ -440,6 +449,30 @@
         </div>
     </div>
 
+    <!-- 在线客服 -->
+    <div class="customer-service">
+        <div class="customer-service-button" onclick="toggleCustomerService()">
+            <i class="fas fa-headset"></i>
+        </div>
+        <div class="customer-service-dialog" id="customer-service-dialog">
+            <div class="customer-service-header">
+                <span>在线客服</span>
+                <button onclick="toggleCustomerService()" style="background: none; border: none; color: white;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="customer-service-content" id="customer-service-content">
+                <div class="message service">
+                    您好！我是客服小智，有什么可以帮您？
+                </div>
+            </div>
+            <div class="customer-service-input">
+                <input type="text" id="customer-service-input" placeholder="请输入您的问题...">
+                <button onclick="sendMessage()">发送</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // 移动端菜单控制
         document.querySelector('.mobile-menu-button').addEventListener('click', function() {
@@ -453,138 +486,28 @@
             }
         });
 
-        // 现有的购物车脚本保持不变
-        const cart = JSON.parse(localStorage.getItem('cart')) || [];
-        const cartCount = document.getElementById('cart-count');
-        const cartTotal = document.getElementById('cart-total');
-        const cartItems = document.getElementById('cart-items');
-        const cartModal = document.getElementById('cart-modal');
+        // 更新购物车数量显示
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const cartCount = document.getElementById('cart-count');
+            cartCount.textContent = cart.reduce((acc, item) => acc + item.quantity, 0);
+        }
 
+        // 页面加载时更新购物车数量
+        window.addEventListener('load', updateCartCount);
+
+        // 添加商品到购物车时更新数量
         function addToCart(id, name, price, image) {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
             const existingItem = cart.find(item => item.id === id);
             if (existingItem) {
                 existingItem.quantity++;
             } else {
                 cart.push({ id, name, price, quantity: 1, image });
             }
-            updateCart();
-        }
-
-        function updateCart() {
-            cartCount.textContent = cart.reduce((acc, item) => acc + item.quantity, 0);
-            cartTotal.textContent = `￥${cart.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2)}`;
-            
-            cartItems.innerHTML = cart.map(item => `
-                <div class="cart-item flex items-center justify-between p-4 border-b border-gray-200">
-                    <div class="cart-item-details flex items-center space-x-4">
-                        <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg">
-                        <div>
-                            <h4 class="font-medium">${item.name}</h4>
-                            <p class="text-sm text-gray-500">￥${item.price} × ${item.quantity}</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-3">
-                        <button onclick="decreaseQuantity(${item.id})" 
-                                class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100">
-                            <i class="fas fa-minus text-sm"></i>
-                        </button>
-                        <span class="w-8 text-center">${item.quantity}</span>
-                        <button onclick="increaseQuantity(${item.id})" 
-                                class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100">
-                            <i class="fas fa-plus text-sm"></i>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-            
             localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
         }
-
-        function increaseQuantity(id) {
-            const item = cart.find(item => item.id === id);
-            if (item) item.quantity++;
-            updateCart();
-        }
-
-        function decreaseQuantity(id) {
-            const item = cart.find(item => item.id === id);
-            if (item && item.quantity > 1) item.quantity--;
-            else if (item) cart.splice(cart.indexOf(item), 1);
-            updateCart();
-        }
-
-        function startCheckout() {
-            if (cart.length === 0) {
-                alert('购物车为空！');
-                return;
-            }
-            document.getElementById('checkout-form').classList.remove('hidden');
-            document.querySelector('button[onclick="startCheckout()"]').classList.add('hidden');
-        }
-
-        function cancelCheckout() {
-            document.getElementById('checkout-form').classList.add('hidden');
-            document.querySelector('button[onclick="startCheckout()"]').classList.remove('hidden');
-        }
-
-        function submitOrder() {
-            const name = document.getElementById('receiver-name').value;
-            const phone = document.getElementById('receiver-phone').value;
-            const address = document.getElementById('receiver-address').value;
-
-            if (!name || !phone || !address) {
-                alert('请填写完整的收货信息！');
-                return;
-            }
-
-            // 创建订单数据
-            const orderData = {
-                id: 'ORD' + Date.now(),
-                time: new Date().toLocaleString(),
-                status: '待发货',
-                receiver: name,
-                phone: phone,
-                address: address,
-                items: cart.map(item => ({
-                    name: item.name,
-                    price: item.price,
-                    quantity: item.quantity
-                })),
-                total: cart.reduce((acc, item) => acc + item.price * item.quantity, 0)
-            };
-
-            // 保存订单
-            saveOrder(orderData);
-            
-            // 清空购物车
-            cart.length = 0;
-            localStorage.setItem('cart', JSON.stringify(cart));
-            updateCart();
-            closeCartModal();
-            alert('订单提交成功！');
-        }
-
-        function openCartModal() {
-            cartModal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeCartModal() {
-            cartModal.classList.add('hidden');
-            document.body.style.overflow = '';
-        }
-
-        document.getElementById('cart-button').addEventListener('click', openCartModal);
-
-        // 点击模态框外部关闭
-        cartModal.addEventListener('click', (e) => {
-            if (e.target === cartModal) {
-                closeCartModal();
-            }
-        });
-
-        // 初始化购物车显示
-        updateCart();
 
         // 用户登录相关函数
         let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
@@ -774,7 +697,254 @@
                 closeOrderQuery();
             }
         });
+
+        // 客服相关功能
+        let customerMessages = JSON.parse(localStorage.getItem('customerMessages')) || [];
+
+        function toggleCustomerService() {
+            const dialog = document.getElementById('customer-service-dialog');
+            dialog.classList.toggle('active');
+            
+            // 当打开对话框时，加载历史消息
+            if (dialog.classList.contains('active')) {
+                loadCustomerMessages();
+            }
+        }
+
+        function loadCustomerMessages() {
+            const content = document.getElementById('customer-service-content');
+            const messages = JSON.parse(localStorage.getItem('customerMessages')) || [];
+            
+            // 清空现有消息
+            content.innerHTML = '<div class="message service">您好！我是客服小智，有什么可以帮您？</div>';
+            
+            // 按时间顺序显示消息
+            messages.forEach(message => {
+                // 显示用户消息
+                content.innerHTML += `
+                    <div class="message user">
+                        ${message.message}
+                    </div>
+                `;
+                
+                // 如果消息已回复，显示回复内容
+                if (message.replied && message.replyContent) {
+                    content.innerHTML += `
+                        <div class="message service">
+                            ${message.replyContent}
+                        </div>
+                    `;
+                }
+            });
+            
+            // 滚动到底部
+            content.scrollTop = content.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('customer-service-input');
+            const content = document.getElementById('customer-service-content');
+            const message = input.value.trim();
+
+            if (message) {
+                // 创建新消息对象
+                const newMessage = {
+                    id: Date.now(),
+                    user: currentUser ? currentUser.name : '访客',
+                    userPhone: currentUser ? currentUser.phone : '未登录',
+                    message: message,
+                    time: new Date().toLocaleString(),
+                    replied: false
+                };
+                
+                // 添加到消息列表
+                customerMessages.push(newMessage);
+                localStorage.setItem('customerMessages', JSON.stringify(customerMessages));
+
+                // 添加用户消息到聊天框
+                content.innerHTML += `
+                    <div class="message user">
+                        ${message}
+                    </div>
+                `;
+
+                // 模拟客服回复
+                setTimeout(() => {
+                    content.innerHTML += `
+                        <div class="message service">
+                            感谢您的咨询，我们的客服人员会尽快回复您的问题。
+                        </div>
+                    `;
+                    content.scrollTop = content.scrollHeight;
+                }, 1000);
+
+                input.value = '';
+                content.scrollTop = content.scrollHeight;
+            }
+        }
+
+        // 按回车发送消息
+        document.getElementById('customer-service-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // 点击模态框外部关闭客服对话框
+        document.addEventListener('click', function(e) {
+            const dialog = document.getElementById('customer-service-dialog');
+            const button = document.querySelector('.customer-service-button');
+            
+            if (!dialog.contains(e.target) && !button.contains(e.target)) {
+                dialog.classList.remove('active');
+            }
+        });
+
+        // 产品数据和分类功能
+        let products = JSON.parse(localStorage.getItem('products')) || [];
+        let categories = JSON.parse(localStorage.getItem('categories')) || [];
+        let currentCategory = 'all';
+
+        // 默认分类数据
+        const defaultCategories = [
+            { id: 'all', name: '全部商品' },
+            { id: 'category1', name: '家居用品' },
+            { id: 'category2', name: '数码配件' },
+            { id: 'category3', name: '美妆护肤' }
+        ];
+
+        // 初始化分类数据
+        function initializeCategories() {
+            // 从localStorage获取分类数据
+            let storedCategories = JSON.parse(localStorage.getItem('categories'));
+            console.log('Stored categories:', storedCategories);
+            
+            // 如果没有存储的分类数据，使用默认分类
+            if (!storedCategories || !Array.isArray(storedCategories) || storedCategories.length === 0) {
+                storedCategories = defaultCategories;
+                localStorage.setItem('categories', JSON.stringify(defaultCategories));
+                console.log('Using default categories');
+            }
+            
+            // 确保分类数据格式正确
+            const validCategories = storedCategories.filter(cat => 
+                cat && typeof cat === 'object' && 
+                cat.id && typeof cat.id === 'string' && 
+                cat.name && typeof cat.name === 'string'
+            );
+            
+            // 确保包含"全部商品"分类
+            if (!validCategories.some(cat => cat.id === 'all')) {
+                validCategories.unshift({ id: 'all', name: '全部商品' });
+            }
+            
+            categories = validCategories;
+            console.log('Final categories:', categories);
+            updateCategoryButtons();
+        }
+
+        // 更新分类按钮显示
+        function updateCategoryButtons() {
+            const categoryButtons = document.getElementById('category-buttons');
+            console.log('Updating category buttons with:', categories);
+            
+            // 确保"全部商品"始终是第一个分类
+            const allCategory = { id: 'all', name: '全部商品' };
+            const otherCategories = categories.filter(cat => cat.id !== 'all');
+            
+            // 组合分类列表，确保"全部商品"在最前面
+            const displayCategories = [allCategory, ...otherCategories];
+            
+            categoryButtons.innerHTML = displayCategories.map(category => {
+                // 添加数据验证
+                const categoryName = category && category.name ? category.name : '未命名分类';
+                const isSelected = category.id === currentCategory;
+                return `
+                    <button onclick="filterProducts('${category.id}')" 
+                            class="category-btn px-6 py-2 rounded-full ${
+                                isSelected 
+                                ? 'bg-white text-black font-bold border border-gray-300' 
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }">
+                        ${categoryName}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function filterProducts(category) {
+            currentCategory = category;
+            updateCategoryButtons();
+
+            // 筛选并显示产品
+            const filteredProducts = category === 'all' 
+                ? products 
+                : products.filter(product => product.category === category);
+            
+            displayProducts(filteredProducts);
+        }
+
+        function displayProducts(productsToShow) {
+            const productList = document.getElementById('product-list');
+            const noResults = document.getElementById('no-results');
+
+            if (productsToShow.length === 0) {
+                noResults.classList.remove('hidden');
+                productList.innerHTML = '';
+                return;
+            }
+
+            noResults.classList.add('hidden');
+            productList.innerHTML = productsToShow.map(product => `
+                <div class="product-item bg-white p-4 rounded-lg overflow-hidden">
+                    <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover rounded-md mb-4">
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">${product.name}</h3>
+                    <p class="text-gray-600 mb-4">${product.description}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xl font-bold text-green-500">￥${product.price}</span>
+                        <button onclick="addToCart(${product.id}, '${product.name}', ${product.price}, '${product.image}')" 
+                                class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
+                            加入购物车
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 搜索功能
+        document.getElementById('search-input').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredProducts = products.filter(product => 
+                product.name.toLowerCase().includes(searchTerm) || 
+                product.description.toLowerCase().includes(searchTerm)
+            );
+            displayProducts(filteredProducts);
+        });
+
+        // 页面加载时显示所有产品
+        window.addEventListener('load', () => {
+            updateCartCount();
+            initializeCategories(); // 初始化分类数据
+            displayProducts(products); // 默认显示所有产品
+        });
+
+        // 监听分类更新事件
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'frontend_categories') {
+                const newCategories = JSON.parse(e.newValue) || [];
+                categories = newCategories;
+                updateCategoryButtons();
+                console.log('分类数据已更新:', newCategories);
+            }
+        });
+
+        // 监听自定义事件
+        window.addEventListener('categoriesUpdated', function(e) {
+            categories = e.detail.categories;
+            updateCategoryButtons();
+            console.log('分类数据已更新:', categories);
+        });
     </script>
 </body>
 
-</html> 
+</html>
