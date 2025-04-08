@@ -1,8 +1,5 @@
     <!-- 物流信息填写模态框 -->
     <div id="shippingModal" class="modal hidden">
-<!-- checkout.html -->
-<!DOCTYPE html>
-<html lang="zh-CN">
         <div class="modal-overlay"></div>
         <div class="modal-container">
             <div class="modal-header">
@@ -31,10 +28,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>购物车 - 电商平台</title>
-    <title>收银台 - 电商平台</title>
     
     <!-- 引入Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Tailwind CSS（注意：这里应该使用link标签引入CSS文件，而不是script标签） -->
+    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
     
     <!-- 自定义样式 -->
     <style>
@@ -76,13 +74,6 @@
             <!-- 空购物车提示 -->
             <div id="empty-cart" class="hidden text-center py-12">
                 <i class="fas fa-shopping-cart text-6xl text-gray-300 mb-4"></i>
-    <!-- 收银台页面内容 -->
-    <h1>收银台</h1>
-    <p>总金额：￥<span id="order-total">0.00</span></p>
-    <!-- 支付方式选择 -->
-    <select id="payment-method">
-        <option value="alipay">支付宝</option>
-        <option value="wechat">微信支付</option>
                 <p class="text-gray-500 text-lg">您的购物车是空的</p>
                 <a href="./index.html" class="mt-4 inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
                     去逛逛
@@ -256,6 +247,14 @@
 
             // 结算功能
             checkout() {
+                if (this.cart.length === 0) {
+                    alert('请先添加商品到购物车');
+                    return;
+                }
+                
+                // 显示物流信息填写模态框
+                document.getElementById('shippingModal').classList.remove('hidden');
+            }
                 if (this.cart.length === 0) {
                     alert('请先添加商品到购物车');
                     return;
