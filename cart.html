@@ -1,275 +1,250 @@
-    <!-- 物流信息填写模态框 -->
-    <div id="shippingModal" class="modal hidden">
-        <div class="modal-overlay"></div>
-        <div class="modal-container">
-            <div class="modal-header">
-                <h2>填写物流信息</h2>
-                <button class="modal-close" onclick="closeModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="shippingForm">
-                    <label for="name">姓名:</label>
-                    <input type="text" id="name" name="name" required>
-                    <label for="address">地址:</label>
-                    <input type="text" id="address" name="address" required>
-                    <label for="phone">电话:</label>
-                    <input type="tel" id="phone" name="phone" required>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" onclick="submitShippingInfo()">提交</button>
-                <button type="button" onclick="closeModal()">取消</button>
-            </div>
-        </div>
-    </div>
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>购物车 - 电商平台</title>
-    
-    <!-- 引入Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- 自定义样式 -->
+    <title>购物车 - 随心选</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
     <style>
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 20px;
+        }
         .cart-item {
-            transition: all 0.3s ease;
+            border-bottom: 1px solid #eee;
+            padding: 20px 0;
         }
-        .cart-item-remove {
-            opacity: 0;
-            transition: opacity 0.3s ease;
+        .cart-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
         }
-        .cart-item:hover .cart-item-remove {
-            opacity: 1;
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .quantity-control button {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .quantity-control button:hover {
+            background-color: #f5f5f5;
+        }
+        @media (max-width: 640px) {
+            .cart-item {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .cart-item img {
+                width: 100%;
+                height: 200px;
+            }
         }
     </style>
 </head>
-<body class="bg-gray-100">
-    <!-- 导航栏 -->
+<body class="bg-gray-50">
     <nav class="bg-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="flex justify-between items-center py-4">
-                <a href="./index.html" class="text-2xl font-bold text-blue-600">电商平台</a>
-                <a href="./cart.html" class="relative text-gray-600 hover:text-blue-600">
-                    <i class="fas fa-shopping-cart text-xl"></i>
-                    <span id="cart-count" 
-                          class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                        0
-                    </span>
-                </a>
+        <div class="container">
+            <div class="flex items-center justify-between py-4">
+                <a href="index-2.html" class="text-2xl font-bold text-gray-800">随心选</a>
+                <h1 class="text-xl font-semibold text-gray-700">购物车</h1>
             </div>
         </div>
     </nav>
 
-    <!-- 购物车主内容 -->
-    <main class="max-w-7xl mx-auto px-4 py-8">
+    <main class="container py-8">
+        <div id="cart-items" class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <!-- 购物车商品将通过 JavaScript 动态加载 -->
+        </div>
+
         <div class="bg-white rounded-lg shadow-md p-6">
-            <!-- 标题 -->
-            <h1 class="text-3xl font-bold text-gray-800 mb-6">我的购物车</h1>
-            
-            <!-- 空购物车提示 -->
-            <div id="empty-cart" class="hidden text-center py-12">
-                <i class="fas fa-shopping-cart text-6xl text-gray-300 mb-4"></i>
-                <p class="text-gray-500 text-lg">您的购物车是空的</p>
-                <a href="./index.html" class="mt-4 inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
-                    去逛逛
-                </a>
+            <div class="flex justify-between items-center mb-6">
+                <span class="text-lg font-semibold">总计：</span>
+                <span id="cart-total" class="text-2xl font-bold text-green-500">￥0.00</span>
             </div>
-
-            <!-- 商品列表 -->
-            <div id="cart-items" class="space-y-4"></div>
-
-            <!-- 结算栏 -->
-            <div class="mt-8 pt-6 border-t border-gray-200">
-                <div class="flex justify-between items-center">
-                    <div class="space-y-2">
-                        <p class="text-xl font-semibold">
-                            总计：￥<span id="cart-total">0.00</span>
-                        </p>
-                        <p class="text-sm text-gray-500">不含运费，结算时计算</p>
-                    </div>
-                    <div class="space-x-4">
-                        <button onclick="clearCart()" 
-                                class="px-6 py-2 border border-red-500 text-red-500 rounded-lg hover:bg-red-50">
-                            清空购物车
-                        </button>
-                        <button onclick="checkout()" 
-                                class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                            去结算（<span id="cart-count-checkout">0</span>件）
-                        </button>
-                    </div>
-                </div>
+            <div class="flex justify-end gap-4">
+                <a href="index-2.html" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                    继续购物
+                </a>
+                <button onclick="startCheckout()" class="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
+                    去结算
+                </button>
             </div>
         </div>
     </main>
 
-    <!-- 商品模板（用于动态生成） -->
-    <template id="cart-item-template">
-        <div class="cart-item relative p-4 border rounded-lg hover:shadow-md">
-            <div class="flex items-start gap-4">
-                <img src="" alt="商品图片" class="w-24 h-24 object-cover rounded-lg">
-                <div class="flex-1">
-                    <h3 class="text-lg font-semibold text-gray-800"></h3>
-                    <p class="text-gray-600 text-sm"></p>
+    <!-- 结算表单 -->
+    <div id="checkout-form" class="fixed inset-0 bg-black bg-opacity-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl mx-auto my-8 p-6 max-w-md">
+            <h3 class="text-lg font-bold mb-4">填写收货信息</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">收货人姓名</label>
+                    <input type="text" id="receiver-name" class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                 </div>
-                <div class="flex flex-col items-end">
-                    <p class="text-xl font-bold text-red-500">￥<span class="item-price">0.00</span></p>
-                    <div class="flex items-center gap-2 mt-2">
-                        <button onclick="updateQuantity('', -1)" 
-                                class="quantity-btn w-8 h-8 rounded bg-gray-100 hover:bg-gray-200">
-                            -
-                        </button>
-                        <span class="quantity">1</span>
-                        <button onclick="updateQuantity('', 1)" 
-                                class="quantity-btn w-8 h-8 rounded bg-gray-100 hover:bg-gray-200">
-                            +
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">联系电话</label>
+                    <input type="tel" id="receiver-phone" class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">收货地址</label>
+                    <textarea id="receiver-address" class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3" required></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-4 mt-6">
+                <button onclick="cancelCheckout()" class="px-4 py-2 border rounded-lg hover:bg-gray-100">取消</button>
+                <button onclick="submitOrder()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">提交订单</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 从 localStorage 加载购物车数据
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const cartItems = document.getElementById('cart-items');
+        const cartTotal = document.getElementById('cart-total');
+
+        function updateCart() {
+            if (cart.length === 0) {
+                cartItems.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-shopping-cart text-4xl text-gray-400 mb-4"></i>
+                        <p class="text-gray-500">购物车是空的</p>
+                        <a href="index-2.html" class="mt-4 inline-block px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
+                            去购物
+                        </a>
+                    </div>
+                `;
+                cartTotal.textContent = '￥0.00';
+                return;
+            }
+
+            cartItems.innerHTML = cart.map(item => `
+                <div class="cart-item flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <img src="${item.image}" alt="${item.name}">
+                        <div>
+                            <h3 class="font-medium">${item.name}</h3>
+                            <p class="text-gray-500">￥${item.price}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-6">
+                        <div class="quantity-control">
+                            <button onclick="decreaseQuantity(${item.id})">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <span>${item.quantity}</span>
+                            <button onclick="increaseQuantity(${item.id})">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <button onclick="removeItem(${item.id})" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash"></i>
                         </button>
                     </div>
                 </div>
-                <button onclick="removeItem('')" 
-                        class="cart-item-remove absolute top-2 right-2 text-gray-400 hover:text-red-500">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        </div>
-    </template>
+            `).join('');
 
-    <script>
-        // 购物车核心功能
-        class CartManager {
-            constructor() {
-                this.cart = this.loadCart();
-            }
+            cartTotal.textContent = `￥${cart.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2)}`;
+        }
 
-            // 加载购物车数据
-            loadCart() {
-                try {
-                    return JSON.parse(localStorage.getItem('cart')) || [];
-                } catch (e) {
-                    console.error('购物车数据加载失败:', e);
-                    return [];
-                }
-            }
-
-            // 保存购物车数据
-            saveCart() {
-                try {
-                    localStorage.setItem('cart', JSON.stringify(this.cart));
-                    this.updateCartCount();
-                } catch (e) {
-                    console.error('购物车数据保存失败:', e);
-                }
-            }
-
-            // 更新购物车数量显示
-            updateCartCount() {
-                const count = this.cart.reduce((sum, item) => sum + item.quantity, 0);
-                document.querySelectorAll('#cart-count, #cart-count-checkout').forEach(el => {
-                    el.textContent = count;
-                });
-            }
-
-            // 渲染购物车
-            renderCart() {
-                const container = document.getElementById('cart-items');
-                const template = document.getElementById('cart-item-template');
-                const emptyCart = document.getElementById('empty-cart');
-                
-                container.innerHTML = '';
-                
-                if (this.cart.length === 0) {
-                    emptyCart.classList.remove('hidden');
-                    document.getElementById('cart-total').textContent = '0.00';
-                    return;
-                }
-
-                emptyCart.classList.add('hidden');
-                let total = 0;
-
-                this.cart.forEach(item => {
-                    const clone = template.content.cloneNode(true);
-                    const element = clone.querySelector('.cart-item');
-                    
-                    // 填充数据
-                    element.querySelector('img').src = item.image;
-                    element.querySelector('h3').textContent = item.name;
-                    element.querySelector('p').textContent = item.description;
-                    element.querySelector('.item-price').textContent = item.price.toFixed(2);
-                    element.querySelector('.quantity').textContent = item.quantity;
-                    
-                    // 更新价格
-                    const totalPrice = item.price * item.quantity;
-                    total += totalPrice;
-                    
-                    // 绑定事件
-                    const buttons = clone.querySelectorAll('button');
-                    buttons.forEach(btn => {
-                        const action = btn.getAttribute('onclick');
-                        btn.setAttribute('onclick', action.replace(/''/g, `'${item.id}'`));
-                    });
-
-                    container.appendChild(clone);
-                });
-
-                document.getElementById('cart-total').textContent = total.toFixed(2);
-            }
-
-            // 更新商品数量
-            updateQuantity(itemId, delta) {
-                const item = this.cart.find(i => i.id === itemId);
-                if (item) {
-                    item.quantity += delta;
-                    if (item.quantity < 1) item.quantity = 1;
-                    this.saveCart();
-                    this.renderCart();
-                }
-            }
-
-            // 删除商品
-            removeItem(itemId) {
-                this.cart = this.cart.filter(i => i.id !== itemId);
-                this.saveCart();
-                this.renderCart();
-            }
-
-            // 清空购物车
-            clearCart() {
-                if (confirm('确定要清空购物车吗？')) {
-                    this.cart = [];
-                    this.saveCart();
-                    this.renderCart();
-                }
-            }
-
-            // 结算功能
-            checkout() {
-                if (this.cart.length === 0) {
-                    alert('请先添加商品到购物车');
-                    return;
-                }
-                
-                // 此处可扩展支付逻辑
-                alert(`共 ${this.cart.length} 件商品，总金额：￥${document.getElementById('cart-total').textContent}`);
+        function increaseQuantity(id) {
+            const item = cart.find(item => item.id === id);
+            if (item) {
+                item.quantity++;
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCart();
             }
         }
 
-        // 初始化购物车
-        const cartManager = new CartManager();
-        window.addEventListener('DOMContentLoaded', () => {
-            cartManager.renderCart();
-            cartManager.updateCartCount();
-        });
+        function decreaseQuantity(id) {
+            const item = cart.find(item => item.id === id);
+            if (item) {
+                if (item.quantity > 1) {
+                    item.quantity--;
+                } else {
+                    cart.splice(cart.indexOf(item), 1);
+                }
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCart();
+            }
+        }
 
-        // 暴露全局方法
-        window.updateQuantity = (id, delta) => cartManager.updateQuantity(id, delta);
-        window.removeItem = (id) => cartManager.removeItem(id);
-        window.clearCart = () => cartManager.clearCart();
-        window.checkout = () => cartManager.checkout();
+        function removeItem(id) {
+            const item = cart.find(item => item.id === id);
+            if (item) {
+                cart.splice(cart.indexOf(item), 1);
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCart();
+            }
+        }
+
+        function startCheckout() {
+            if (cart.length === 0) {
+                alert('购物车为空！');
+                return;
+            }
+            document.getElementById('checkout-form').classList.remove('hidden');
+        }
+
+        function cancelCheckout() {
+            document.getElementById('checkout-form').classList.add('hidden');
+        }
+
+        function submitOrder() {
+            const name = document.getElementById('receiver-name').value;
+            const phone = document.getElementById('receiver-phone').value;
+            const address = document.getElementById('receiver-address').value;
+
+            if (!name || !phone || !address) {
+                alert('请填写完整的收货信息！');
+                return;
+            }
+
+            // 创建订单数据
+            const orderData = {
+                id: 'ORD' + Date.now(),
+                time: new Date().toLocaleString(),
+                status: '待发货',
+                receiver: name,
+                phone: phone,
+                address: address,
+                items: cart.map(item => ({
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity
+                })),
+                total: cart.reduce((acc, item) => acc + item.price * item.quantity, 0)
+            };
+
+            // 保存订单
+            let orders = JSON.parse(localStorage.getItem('orders')) || {};
+            if (!orders[phone]) {
+                orders[phone] = [];
+            }
+            orders[phone].push(orderData);
+            localStorage.setItem('orders', JSON.stringify(orders));
+            
+            // 清空购物车
+            cart.length = 0;
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCart();
+            document.getElementById('checkout-form').classList.add('hidden');
+            alert('订单提交成功！');
+        }
+
+        // 页面加载时更新购物车显示
+        window.addEventListener('load', updateCart);
     </script>
-
-    <!-- Font Awesome图标 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
 </body>
-</html>
+</html> 
