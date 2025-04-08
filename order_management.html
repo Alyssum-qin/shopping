@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>随心选 - 订单管理</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <!-- 顶部导航栏 -->
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <h1 class="text-2xl font-bold text-gray-800">随心选 - 订单管理</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button onclick="window.location.href='admin.html'" class="text-gray-600 hover:text-blue-800 font-medium">
+                            返回首页
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 主要内容区域 -->
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-bold mb-4">订单查询</h2>
+                <div class="flex gap-4 mb-4">
+                    <input type="text" id="search-input"
+                        placeholder="输入订单号、收货人、联系电话等查询"
+                        class="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button onclick="searchOrders()"
+                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                        查询
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead>
+                            <tr>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">订单号</th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">下单时间</th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">收货人</th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">联系电话</th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">收货地址</th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">商品总数</th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">总金额</th>
+                            </tr>
+                        </thead>
+                        <tbody id="order-list" class="bg-white divide-y divide-gray-200">
+                            <!-- 订单列表将通过 JavaScript 动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="no-orders" class="text-center py-8 hidden">
+                    <p class="text-gray-500">暂无订单信息</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function loadOrders() {
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            const orderList = document.getElementById('order-list');
+            const noOrders = document.getElementById('no-orders');
+
+            if (orders.length === 0) {
+                orderList.innerHTML = '';
+                noOrders.classList.remove('hidden');
+                return;
+            }
+
+            orderList.innerHTML = orders.map(order => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">${order.id}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${order.order_time}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${order.recipient}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${order.phone}</td>
+                    <td class="px-6 py-4">${order.address}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${order.quantity}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">￥${order.total_amount}</td>
+                </tr>
+            `).join('');
+        }
+
+        function searchOrders() {
+            const searchInput = document.getElementById('search-input').value.trim();
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            const orderList = document.getElementById('order-list');
+            const noOrders = document.getElementById('no-orders');
+
+            const filteredOrders = orders.filter(order => {
+                return (
+                    order.id.toString().includes(searchInput) ||
+                    order.recipient.includes(searchInput) ||
+                    order.phone.includes(searchInput)
+                );
+            });
+
+            if (filteredOrders.length === 0) {
+                orderList.innerHTML = '';
+                noOrders.classList.remove('hidden');
+            } else {
+                noOrders.classList.add('hidden');
+                orderList.innerHTML = filteredOrders.map(order => `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">${order.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${order.order_time}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${order.recipient}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${order.phone}</td>
+                        <td class="px-6 py-4">${order.address}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${order.quantity}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">￥${order.total_amount}</td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            loadOrders();
+        });
+    </script>
+</body>
+
+</html>    

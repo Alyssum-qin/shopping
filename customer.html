@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>随心选 - 客服消息管理</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <!-- 顶部导航栏 -->
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <h1 class="text-2xl font-bold text-gray-800">随心选后台管理 - 客服消息</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button onclick="window.location.href='admin.html'" class="text-red-500 hover:text-red-700">
+                            返回
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 主要内容区域 -->
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <!-- 客服消息管理区域 -->
+            <div id="customer-service-tab" class="bg-white p-6 rounded-lg shadow-md mb-6">
+                <h2 class="text-xl font-bold mb-4">客服消息</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead>
+                            <tr>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">用户</th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">联系方式</th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">消息内容</th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">时间</th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customer-message-list" class="bg-white divide-y divide-gray-200">
+                            <!-- 客服消息列表将通过 JavaScript 动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="no-messages" class="text-center py-8 hidden">
+                    <p class="text-gray-500">暂无客服消息</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 从 localStorage 加载数据
+        function loadData(key) {
+            return JSON.parse(localStorage.getItem(key)) || [];
+        }
+
+        // 加载客服消息
+        function loadCustomerMessages() {
+            const messages = loadData('customerMessages');
+            const messageList = document.getElementById('customer-message-list');
+            const noMessages = document.getElementById('no-messages');
+            if (messages.length === 0) {
+                messageList.innerHTML = '';
+                noMessages.classList.remove('hidden');
+                return;
+            }
+
+            // 按时间排序，最新的在前面
+            const sortedMessages = [...messages].sort((a, b) => new Date(b.time) - new Date(a.time));
+
+            messageList.innerHTML = sortedMessages.map(message => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">${message.user}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${message.userPhone}</td>
+                    <td class="px-6 py-4">${message.message}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${message.time}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            message.replied ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                        }">
+                            ${message.replied ? '已回复' : '未回复'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <button onclick="openReplyModal(${message.id})" 
+                                class="text-blue-600 hover:text-blue-900">
+                            回复
+                        </button>
+                        <button onclick="deleteMessage(${message.id})" 
+                                class="ml-3 text-red-600 hover:text-red-900">
+                            删除
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 打开回复模态框
+        function openReplyModal(messageId) {
+            const messages = JSON.parse(localStorage.getItem('customerMessages')) || [];
+            const message = messages.find(m => m.id === messageId);
+
+            if (!message) return;
+
+            const replyContent = prompt('请输入回复内容');
+            if (replyContent) {
+                message.replied = true;
+                message.replyContent = replyContent;
+                message.replyTime = new Date().toLocaleString();
+                localStorage.setItem('customerMessages', JSON.stringify(messages));
+                loadCustomerMessages();
+            }
+        }
+
+        // 删除消息
+        function deleteMessage(messageId) {
+            if (confirm('确定要删除这条消息吗？')) {
+                const messages = JSON.parse(localStorage.getItem('customerMessages')) || [];
+                const newMessages = messages.filter(m => m.id !== messageId);
+
+                localStorage.setItem('customerMessages', JSON.stringify(newMessages));
+                loadCustomerMessages();
+            }
+        }
+
+        // 返回原页面，修改为跳转到 admin 后台首页
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+
+        // 页面加载完成后加载客服消息
+        document.addEventListener('DOMContentLoaded', function () {
+            loadCustomerMessages();
+        });
+    </script>
+</body>
+
+</html>    

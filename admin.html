@@ -19,13 +19,16 @@
                         <h1 class="text-2xl font-bold text-gray-800">随心选后台管理</h1>
                     </div>
                     <div class="flex items-center space-x-4">
-                        <button id="products-tab-btn" onclick="switchTab('products')" class="text-blue-600 hover:text-blue-800 font-medium">
+                        <button id="products-tab-btn" onclick="switchTab('products')" class="text-gray-600 hover:text-blue-800 font-medium hidden">
                             产品管理
                         </button>
-                        <button id="customer-service-tab-btn" onclick="switchTab('customer-service')" class="text-gray-600 hover:text-blue-800 font-medium">
+                        <button id="customer-service-tab-btn" onclick="window.location.href='customer.html' " class="text-gray-600 hover:text-blue-800 font-medium hidden">
                             客服消息
                         </button>
-                        <button onclick="logout()" class="text-red-500 hover:text-red-700">
+                        <button id="orders-tab-btn" onclick="window.location.href='order_management.html' " class="text-gray-600 hover:text-blue-800 font-medium hidden">
+                            订单管理
+                        </button>
+                        <button onclick="logout()" class="text-red-500 hover:text-red-700 hidden" id="logout-btn">
                             退出登录
                         </button>
                     </div>
@@ -35,7 +38,7 @@
 
         <!-- 主要内容区域 -->
         <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-            <!-- 登录表单 -->
+            <!-- 登录表单（初始显示，登录后隐藏） -->
             <div id="login-form" class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
                 <h2 class="text-2xl font-bold mb-6">管理员登录</h2>
                 <div class="space-y-4">
@@ -56,7 +59,7 @@
                 </div>
             </div>
 
-            <!-- 产品管理区域 -->
+            <!-- 产品管理区域（初始隐藏） -->
             <div id="products-tab" class="hidden">
                 <!-- 分类管理 -->
                 <div class="bg-white p-6 rounded-lg shadow-md mb-6">
@@ -145,7 +148,6 @@
             <div id="customer-service-tab" class="hidden">
                 <div class="bg-white p-6 rounded-lg shadow-md mb-6">
                     <h2 class="text-xl font-bold mb-4">客服消息</h2>
-                    
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead>
@@ -163,9 +165,35 @@
                             </tbody>
                         </table>
                     </div>
-                    
                     <div id="no-messages" class="text-center py-8 hidden">
                         <p class="text-gray-500">暂无客服消息</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 订单管理区域 -->
+            <div id="orders-tab" class="hidden">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-xl font-bold mb-4">订单列表</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">订单号</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">下单时间</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">收货人</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">联系电话</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">收货地址</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">商品总数</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">总金额</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">订单状态</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="order-list" class="bg-white divide-y divide-gray-200">
+                                <!-- 订单列表动态生成 -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -312,6 +340,26 @@
             });
         }
 
+        // 从 localStorage 加载数据
+        function loadData(key) {
+            return JSON.parse(localStorage.getItem(key)) || [];
+        }
+
+        // 保存数据到 localStorage
+        function saveData(key, data) {
+            localStorage.setItem(key, JSON.stringify(data));
+        }
+
+        // 显示模态框
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+
+        // 隐藏模态框
+        function hideModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
         // 管理员登录
         function adminLogin() {
             const username = document.getElementById('admin-username').value;
@@ -327,8 +375,8 @@
         // 退出登录
         function logout() {
             document.getElementById('login-form').classList.remove('hidden');
-            document.getElementById('products-tab').classList.add('hidden');
-            document.getElementById('customer-service-tab').classList.add('hidden');
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.querySelectorAll('.nav-button').forEach(btn => btn.classList.add('hidden'));
             document.getElementById('admin-username').value = '';
             document.getElementById('admin-password').value = '';
         }
@@ -341,146 +389,103 @@
                 return;
             }
 
-            // 检查分类是否已存在
             if (categories.some(cat => cat.name === categoryName)) {
                 alert('该分类已存在！');
                 return;
             }
 
-            // 创建新的分类对象
             const newCategory = {
-                id: 'category_' + Date.now(), // 生成唯一ID
+                id: 'category_' + Date.now(),
                 name: categoryName
             };
 
-            // 添加新分类
             categories.push(newCategory);
-            
-            // 保存到 localStorage
-            localStorage.setItem('categories', JSON.stringify(categories));
-            
-            // 清空输入框
+            saveData('categories', categories);
             document.getElementById('category-name').value = '';
-            
-            // 更新UI
             updateCategoryList();
             updateCategorySelect();
-            
-            // 同步到前端页面
             syncCategoriesToFrontend();
         }
 
         // 删除分类
         function deleteCategory(categoryId) {
-            console.log("尝试删除分类ID:", categoryId);
             const category = categories.find(cat => cat.id === categoryId);
-            console.log("要删除的分类:", category);
-            
             if (!category) {
                 console.error("找不到分类:", categoryId);
                 return;
             }
 
             if (confirm(`确定要删除分类"${category.name}"吗？`)) {
-                // 检查产品中是否使用了该分类
                 const productsWithCategory = products.filter(p => p.category === categoryId);
                 if (productsWithCategory.length > 0) {
                     if (confirm(`有${productsWithCategory.length}个产品使用了此分类，删除分类会将这些产品设为"未分类"，是否继续？`)) {
-                        // 更新产品分类
                         products.forEach(product => {
                             if (product.category === categoryId) {
                                 product.category = "";
                             }
                         });
-                        localStorage.setItem('products', JSON.stringify(products));
+                        saveData('products', products);
                     } else {
                         return;
                     }
                 }
-                
-                // 删除分类
+
                 categories = categories.filter(cat => cat.id !== categoryId);
-                console.log("删除后的分类:", categories);
-                
-                // 保存到 localStorage
-                localStorage.setItem('categories', JSON.stringify(categories));
-                
-                // 更新UI
+                saveData('categories', categories);
                 updateCategoryList();
                 updateCategorySelect();
-                loadProducts(); // 更新产品列表显示
-                
-                // 同步到前端页面
+                loadProducts();
                 syncCategoriesToFrontend();
             }
         }
 
         // 同步分类到前端页面
         function syncCategoriesToFrontend() {
-            // 确保包含"全部商品"分类
             const frontendCategories = [
                 { id: 'all', name: '全部商品' },
                 ...categories
             ];
-            
-            // 保存到 localStorage
-            localStorage.setItem('frontend_categories', JSON.stringify(frontendCategories));
-            
-            // 触发自定义事件，通知其他页面更新
+            saveData('frontend_categories', frontendCategories);
             const event = new CustomEvent('categoriesUpdated', {
                 detail: { categories: frontendCategories }
             });
             window.dispatchEvent(event);
-            
             console.log('分类数据已同步到前端:', frontendCategories);
         }
 
         // 更新分类列表显示
         function updateCategoryList() {
             const categoryList = document.getElementById('category-list');
-            console.log("更新分类列表:", categories);
-            
             categoryList.innerHTML = '';
-            
             categories.forEach(category => {
                 const categoryDiv = document.createElement('div');
                 categoryDiv.className = 'flex items-center justify-between bg-gray-100 rounded-lg px-3 py-1 mb-2 w-auto';
-                
                 const categoryName = document.createElement('span');
                 categoryName.textContent = category.name;
-                
                 const deleteButton = document.createElement('button');
                 deleteButton.className = 'ml-2 text-red-500 hover:text-red-700';
                 deleteButton.innerHTML = '<i class="fas fa-times"></i>';
                 deleteButton.onclick = function() {
                     deleteCategory(category.id);
                 };
-                
                 categoryDiv.appendChild(categoryName);
                 categoryDiv.appendChild(deleteButton);
-                
                 categoryList.appendChild(categoryDiv);
             });
         }
 
         // 更新产品表单中的分类选择框
         function updateCategorySelect() {
-            const categorySelect = document.getElementById('product-category');
-            const editCategorySelect = document.getElementById('edit-product-category');
-            
+            const categorySelects = document.querySelectorAll('#product-category, #edit-product-category');
             const options = categories.map(category => `
                 <option value="${category.id}" class="font-bold text-black">${category.name}</option>
             `).join('');
-            
-            categorySelect.innerHTML = `
-                <option value="" class="font-bold text-black">请选择分类</option>
-                ${options}
-            `;
-            
-            editCategorySelect.innerHTML = `
-                <option value="" class="font-bold text-black">请选择分类</option>
-                ${options}
-            `;
+            categorySelects.forEach(select => {
+                select.innerHTML = `
+                    <option value="" class="font-bold text-black">请选择分类</option>
+                    ${options}
+                `;
+            });
         }
 
         // 添加样式到 head
@@ -499,13 +504,8 @@
 
         // 初始化分类数据
         function initializeCategories() {
-            // 从 localStorage 加载分类
-            categories = JSON.parse(localStorage.getItem('categories')) || [];
-            
-            // 同步到前端
+            categories = loadData('categories');
             syncCategoriesToFrontend();
-            
-            // 更新 UI
             updateCategoryList();
             updateCategorySelect();
         }
@@ -514,6 +514,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             initializeCategories();
             loadProducts();
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
         });
 
         // 修改添加产品函数
@@ -531,9 +532,7 @@
             }
 
             try {
-                // 压缩图片
                 const compressedImage = await compressImage(imageInput.files[0]);
-                
                 const product = {
                     id: Date.now(),
                     name: name,
@@ -542,27 +541,16 @@
                     description: description,
                     image: compressedImage
                 };
-
-                // 获取现有产品列表
-                let products = JSON.parse(localStorage.getItem('products')) || [];
-                
-                // 添加新产品
+                products = loadData('products');
                 products.push(product);
-                
-                // 保存到 localStorage
-                localStorage.setItem('products', JSON.stringify(products));
-                
-                // 更新产品列表显示
+                saveData('products', products);
                 loadProducts();
-
-                // 清空表单
                 document.getElementById('product-name').value = '';
                 document.getElementById('product-price').value = '';
                 document.getElementById('product-category').value = '';
                 document.getElementById('product-description').value = '';
                 imageInput.value = '';
                 preview.classList.add('hidden');
-
                 alert('产品添加成功！');
             } catch (error) {
                 alert('图片处理失败，请重试！');
@@ -571,26 +559,31 @@
         }
 
         // 修改图片预览函数，添加压缩预览
-        document.getElementById('product-image').addEventListener('change', async function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                try {
-                    const compressedImage = await compressImage(file);
-                    const preview = document.getElementById('image-preview');
-                    preview.classList.remove('hidden');
-                    preview.querySelector('img').src = compressedImage;
-                } catch (error) {
-                    alert('图片预览失败，请重试！');
-                    console.error('Error previewing image:', error);
+        function setupImagePreview(inputId, previewId) {
+            document.getElementById(inputId).addEventListener('change', async function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    try {
+                        const compressedImage = await compressImage(file);
+                        const preview = document.getElementById(previewId);
+                        preview.classList.remove('hidden');
+                        preview.querySelector('img').src = compressedImage;
+                    } catch (error) {
+                        alert('图片预览失败，请重试！');
+                        console.error('Error previewing image:', error);
+                    }
                 }
-            }
-        });
+            });
+        }
+
+        setupImagePreview('product-image', 'image-preview');
+        setupImagePreview('edit-product-image', 'edit-image-preview');
 
         // 删除产品
         function deleteProduct(id) {
             if (confirm('确定要删除这个产品吗？')) {
                 products = products.filter(p => p.id !== id);
-                localStorage.setItem('products', JSON.stringify(products));
+                saveData('products', products);
                 loadProducts();
             }
         }
@@ -604,27 +597,19 @@
             if (!product) return;
 
             currentEditingProductId = productId;
-            
-            // 填充表单数据
             document.getElementById('edit-product-name').value = product.name;
             document.getElementById('edit-product-price').value = product.price;
             document.getElementById('edit-product-category').value = product.category;
             document.getElementById('edit-product-description').value = product.description;
             document.getElementById('edit-image-preview').querySelector('img').src = product.image;
-            
-            // 更新分类选择框
             updateCategorySelect();
-            
-            // 设置当前产品的分类
             document.getElementById('edit-product-category').value = product.category;
-            
-            // 显示模态框
-            document.getElementById('edit-modal').classList.remove('hidden');
+            showModal('edit-modal');
         }
 
         // 关闭编辑模态框
         function closeEditModal() {
-            document.getElementById('edit-modal').classList.add('hidden');
+            hideModal('edit-modal');
             currentEditingProductId = null;
         }
 
@@ -638,14 +623,12 @@
             const description = document.getElementById('edit-product-description').value;
             const imageInput = document.getElementById('edit-product-image');
 
-            // 获取当前产品信息
             const productIndex = products.findIndex(p => p.id === currentEditingProductId);
             if (productIndex === -1) return;
 
             const currentProduct = products[productIndex];
             const updatedProduct = { ...currentProduct };
 
-            // 只更新已修改的字段
             if (name && name !== currentProduct.name) {
                 updatedProduct.name = name;
             }
@@ -660,14 +643,11 @@
             }
 
             try {
-                // 如果上传了新图片，则处理新图片
                 if (imageInput.files[0]) {
                     updatedProduct.image = await compressImage(imageInput.files[0]);
                 }
-
-                // 更新产品信息
                 products[productIndex] = updatedProduct;
-                localStorage.setItem('products', JSON.stringify(products));
+                saveData('products', products);
                 loadProducts();
                 closeEditModal();
                 alert('产品更新成功！');
@@ -677,36 +657,17 @@
             }
         }
 
-        // 为编辑模态框的图片上传添加预览功能
-        document.getElementById('edit-product-image').addEventListener('change', async function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                try {
-                    const compressedImage = await compressImage(file);
-                    const preview = document.getElementById('edit-image-preview');
-                    preview.querySelector('img').src = compressedImage;
-                } catch (error) {
-                    alert('图片预览失败，请重试！');
-                    console.error('Error previewing image:', error);
-                }
-            }
-        });
-
         // 修改加载产品列表函数
         function loadProducts() {
-            const products = JSON.parse(localStorage.getItem('products')) || [];
+            products = loadData('products');
             const productList = document.getElementById('product-list');
-            
             if (products.length === 0) {
                 productList.innerHTML = '<tr><td colspan="6" class="text-center py-4">暂无产品</td></tr>';
                 return;
             }
-            
             productList.innerHTML = products.map(product => {
-                // 查找分类名称
                 const category = categories.find(cat => cat.id === product.category);
                 const categoryName = category ? category.name : '未分类';
-                
                 return `
                 <tr>
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -727,25 +688,20 @@
                         </button>
                     </td>
                 </tr>
-            `}).join('');
+            `;
+            }).join('');
         }
 
         // 添加客服消息管理功能
         let currentMessageId = null;
-        
+
         // 切换标签页
         function switchTab(tab) {
-            // 隐藏所有标签页
-            document.getElementById('products-tab').classList.add('hidden');
-            document.getElementById('customer-service-tab').classList.add('hidden');
-            
-            // 重置标签按钮颜色
-            document.getElementById('products-tab-btn').classList.remove('text-blue-600');
-            document.getElementById('products-tab-btn').classList.add('text-gray-600');
-            document.getElementById('customer-service-tab-btn').classList.remove('text-blue-600');
-            document.getElementById('customer-service-tab-btn').classList.add('text-gray-600');
-            
-            // 显示选中的标签页
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.querySelectorAll('.nav-button').forEach(btn => {
+                btn.classList.remove('text-blue-600');
+                btn.classList.add('text-gray-600');
+            });
             if (tab === 'products') {
                 document.getElementById('products-tab').classList.remove('hidden');
                 document.getElementById('products-tab-btn').classList.remove('text-gray-600');
@@ -757,20 +713,17 @@
                 loadCustomerMessages();
             }
         }
-        
+
         // 加载客服消息
         function loadCustomerMessages() {
-            const messages = JSON.parse(localStorage.getItem('customerMessages')) || [];
+            const messages = loadData('customerMessages');
             const messageList = document.getElementById('customer-message-list');
             const noMessages = document.getElementById('no-messages');
-            
             if (messages.length === 0) {
                 messageList.innerHTML = '';
                 noMessages.classList.remove('hidden');
                 return;
-            }
-            
-            noMessages.classList.add('hidden');
+	 }
             
             // 按时间排序，最新的在前面
             const sortedMessages = [...messages].sort((a, b) => new Date(b.time) - new Date(a.time));
@@ -863,6 +816,7 @@
         // 管理员登录后的默认显示
         function adminLoggedIn() {
             document.getElementById('login-form').classList.add('hidden');
+	    document.querySelectorAll('.text-gray-600').forEach(btn => btn.classList.remove('hidden'));
             document.getElementById('products-tab').classList.remove('hidden');
             switchTab('products');
             loadProducts();
