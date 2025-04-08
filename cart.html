@@ -1,3 +1,27 @@
+    <!-- 物流信息填写模态框 -->
+    <div id="shippingModal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2>填写物流信息</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="shippingForm">
+                    <label for="name">姓名:</label>
+                    <input type="text" id="name" name="name" required>
+                    <label for="address">地址:</label>
+                    <input type="text" id="address" name="address" required>
+                    <label for="phone">电话:</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="submitShippingInfo()">提交</button>
+                <button type="button" onclick="closeModal()">取消</button>
+            </div>
+        </div>
+    </div>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
